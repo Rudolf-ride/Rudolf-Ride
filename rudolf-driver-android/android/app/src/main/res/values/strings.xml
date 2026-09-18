@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rudolf Ride Driver</string>
+    <string name="title_activity_main">Rudolf Ride Driver</string>
+    <string name="package_name">com.rudolfride.driver</string>
+    <string name="custom_url_scheme">com.rudolfride.driver</string>
+</resources>
