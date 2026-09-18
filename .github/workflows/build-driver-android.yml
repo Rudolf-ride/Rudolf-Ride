@@ -26,6 +26,10 @@ jobs:
         working-directory: rudolf-driver-android
         run: npm ci
 
+      - name: Bundle mobile notifications
+        working-directory: rudolf-driver-android
+        run: npx --no-install esbuild src/mobile-push.js --bundle --format=iife --platform=browser --target=es2020 --outfile=www/mobile-push.js
+
       - name: Sync Android
         working-directory: rudolf-driver-android
         run: npx cap sync android
