@@ -1,0 +1,41 @@
+name: Build Rudolf Driver Android
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-driver-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        working-directory: rudolf-driver-android
+        run: npm ci
+
+      - name: Sync Android
+        working-directory: rudolf-driver-android
+        run: npx cap sync android
+
+      - name: Build APK
+        working-directory: rudolf-driver-android/android
+        run: ./gradlew assembleDebug
+
+      - name: Save APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rudolf-Ride-Driver-APK
+          path: rudolf-driver-android/android/app/build/outputs/apk/debug/app-debug.apk
