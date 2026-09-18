@@ -1,12 +1,875 @@
-<!doctype html>
-<html>
+<!DOCTYPE HTML>
+<html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
   <title>Rudolf Ride Driver</title>
+
+  <link
+    rel="stylesheet"
+    href="driver-style.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  >
 </head>
+
 <body>
-  <h1>Rudolf Ride Driver</h1>
-  <p>Android wrapper test</p>
+<header class="driver-header">
+
+  <div class="driver-brand">
+
+    <div class="profile-avatar">
+      R
+    </div>
+
+    <div>
+      <h1>🚗 Rudolf Ride</h1>
+    </div>
+
+  </div>
+
+
+  <div class="header-actions">
+
+    <div class="driver-score">
+      ⭐ <span id="driver-rating">4.8</span>
+      <small>96%</small>
+    </div>
+
+    <span id="header-driver-status" class="online-status">
+      🟢 Online
+    </span>
+    <div class="driver-menu-wrap">
+      <button
+        class="menu-btn"
+        id="driver-menu-btn"
+        type="button"
+      >
+        ☰
+      </button>
+
+      <div
+        id="driver-menu-dropdown"
+        class="driver-menu-dropdown"
+        style="display:none;"
+      >
+        <button
+          id="driver-logout-btn"
+          type="button"
+        >
+          🚪 Logout
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</header>
+
+
+<main id="driver-home-section" class="driver-home">
+<!-- Rudolf Ride payment menu -->
+<style>
+#rr-payment-menu {
+  position: relative;
+  width: fit-content;
+  margin: 0 0 12px auto;
+  color: #17251e;
+}
+#rr-payment-menu > summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  box-sizing: border-box;
+  border: 1px solid #dce8df;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  list-style: none;
+  font-size: 28px;
+}
+#rr-payment-menu > summary::-webkit-details-marker {
+  display: none;
+}
+#rr-payment-menu > summary:focus-visible {
+  outline: 3px solid #16854b;
+  outline-offset: 3px;
+}
+#rr-payment-menu .rr-payment-options {
+  position: absolute;
+  right: 0;
+  top: 54px;
+  z-index: 2000;
+  width: min(240px, 80vw);
+  box-sizing: border-box;
+  padding: 16px;
+  border: 1px solid #dce8df;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 24px #0002;
+}
+#rr-payment-menu p {
+  margin: 0 0 12px;
+}
+#rr-payment-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#rr-payment-menu li {
+  padding: 10px 0;
+}
+#rr-payment-menu small {
+  display: block;
+  margin-top: 10px;
+  line-height: 1.4;
+  color: #59665e;
+}
+</style>
+
+<details id="rr-payment-menu">
+  <summary aria-label="Payment options" title="Payment options">
+    💵
+  </summary>
+  <div class="rr-payment-options">
+    <p><strong>Payment options</strong></p>
+    <ul>
+      <li>💵 Cash</li>
+      <li>📱 Mobile Money</li>
+      <li>💳 Card</li>
+    </ul>
+    <small>Payment selection is not connected yet.</small>
+  </div>
+</details>
+
+
+
+<section class="driver-profile-card">
+
+  <div class="profile-details">
+
+  </div>
+
+  <div class="vehicle-info">
+
+    <div>
+      🚗
+      <strong>Vehicle</strong>
+      <p id="driver-vehicle">
+        Toyota Corolla
+      </p>
+    </div>
+
+
+    <div>
+      🔖
+      <strong>Plate</strong>
+      <p id="driver-plate">
+        GR 12345
+      </p>
+    </div>
+
+
+    <div>
+      ⭐
+      <strong>Rating</strong>
+      <p>
+        4.8
+      </p>
+    </div>
+
+  </div>
+
+
+</section>
+
+<section class="availability-card">
+      <div>
+        <strong id="driver-status">You're Offline</strong>
+        <p>Go online when you're ready to receive ride requests.</p>
+      </div>
+
+      <button id="availability-btn">Go Online</button>
+    </section>
+    
+      <section class="driver-location-card">
+  
+
+  <p id="driver-gps-status">
+    Waiting for GPS...
+  </p>
+        <button
+  type="button"
+  class="driver-gps-btn"
+  onclick="startDriverLiveLocation()"
+>
+  📍 Activate Driver GPS
+</button>
+
+  <div id="driver-location-map"></div>
+</section>
+
+    <section class="activity-card">
+      <div class="activity-stats">
+        <div>
+          <strong id="today-rides">0</strong>
+          <span>Rides</span>
+        </div>
+
+        <div>
+          <strong id="today-completed">0</strong>
+          <span>Completed</span>
+        </div>
+
+        <div>
+          <strong id="today-earnings">GH₵ 0.00</strong>
+          <span>Earnings</span>
+        </div>
+      </div>
+
+      <section class="request-card" id="ride-request">
+        <p id="ride-status">Waiting for response...</p>
+
+        <h2>New Ride Request</h2>
+        <p id="new-request-alert" style="display: none;">
+  🔔 New passenger request!
+</p>
+        <p>
+          <strong>Pickup:</strong>
+          <span id="request-pickup">Waiting for request...</span>
+        </p>
+
+             <p>
+          <strong>Destination:</strong>
+          <span id="request-destination">Waiting for request...</span>
+        </p>
+
+        <p>
+          <strong>Ride Type:</strong>
+          <span id="request-type">Waiting...</span>
+        </p>
+
+        <p>
+          <strong>Fare:</strong>
+          <span id="request-fare">GH₵ 0.00</span>
+        </p>
+           
+        
+        <div class="request-buttons">
+          <button class="accept-btn">Accept Ride</button>
+          <button class="decline-btn">Decline</button>
+        </div>
+      </section>
+
+    </section>
+
+  </main>
+
+<!-- DRIVER PROFILE SECTION -->
+<section id="driver-profile-section" class="driver-section" style="display: none;">
+
+  <div class="section-title">
+    <h2>👤 My Profile</h2>
+    <p>Your driver information</p>
+  </div>
+
+  <div class="profile-card">
+
+    <div class="profile-top">
+
+      <div class="profile-avatar">
+        R
+      </div>
+
+      <div>
+        <h2 id="profile-driver-name">
+          Rudolf
+        </h2>
+
+        <p>
+        </p>
+      </div>
+
+    </div>
+
+
+    <div class="profile-rating">
+      ⭐ <strong id="profile-driver-rating">4.8</strong>
+      <span>Driver Rating</span>
+    </div>
+
+
+    <div class="profile-info">
+
+      <div>
+        <span>🚗 Vehicle</span>
+        <strong id="profile-driver-vehicle">
+          Toyota Corolla
+        </strong>
+      </div>
+
+
+      <div>
+        <span>🔢 Plate Number</span>
+        <strong id="profile-driver-plate">
+          GR 12345
+        </strong>
+      </div>
+
+
+      <div>
+        <span>🟢 Status</span>
+        <strong id="profile-driver-status">
+          Offline
+        </strong>
+      </div>
+
+    </div>
+
+
+    <button type="button" class="edit-profile-btn" onclick="editDriverProfile()">
+      ✏️ Edit Profile
+    </button>
+
+  </div>
+
+</section>
+
+  <!-- RIDES SECTION -->
+  <section id="driver-rides-section" class="driver-section" style="display: none;">
+
+    <div class="section-title">
+      <h2>📋 My Rides</h2>
+      <p>Your current and completed rides</p>
+    </div>
+
+    <div id="driver-rides-list">
+
+      <div class="empty-rides" id="no-rides-message">
+        <div>🚕</div>
+        <strong>No rides yet</strong>
+        <p>Your current and completed rides will appear here.</p>
+      </div>
+
+    </div>
+
+  </section>
+
+        
+<!-- RIDE DETAILS SECTION -->
+<section
+  id="driver-ride-details-section"
+  class="driver-section ride-details-section"
+  style="display: none;"
+>
+  <div class="section-title">
+    <h2>🚗 Ride Details</h2>
+    <p>Completed ride information</p>
+  </div>
+
+  <div class="ride-details-card">
+
+    <button
+      type="button"
+      id="ride-details-back-btn"
+      class="ride-details-back-btn"
+    >
+      ← Back to My Rides
+    </button>
+
+    <div id="ride-details-content">
+      <p>Choose a ride to view details.</p>
+    </div>
+
+  </div>
+</section>
+
+<section
+  id="driver-wallet-section"
+  class="driver-section wallet-section"
+  style="display: none;"
+>
+  <div class="wallet-header">
+    <h2>💰 Driver Wallet</h2>
+    <p>Your Rudolf Ride earnings</p>
+  </div>
+
+  <div class="wallet-balance-card">
+    <span>Available Balance</span>
+    <strong id="wallet-balance">GH₵ 0.00</strong>
+
+    <button
+      type="button"
+      class="wallet-withdraw-btn"
+      onclick="showDriverSection('withdraw')"
+    >
+      💸 Withdraw
+    </button>
+  </div>
+
+  <div class="wallet-stats">
+    <div class="wallet-stat-card">
+      <span>Total Fares</span>
+      <strong id="wallet-total-fares">GH₵ 0.00</strong>
+    </div>
+
+    <div class="wallet-stat-card">
+      <span>Your Earnings</span>
+      <strong id="wallet-driver-earnings">GH₵ 0.00</strong>
+    </div>
+
+    <div class="wallet-stat-card">
+      <span>Rudolf Ride Fee</span>
+      <strong id="wallet-platform-fee">GH₵ 0.00</strong>
+    </div>
+
+    <div class="wallet-stat-card">
+      <span>Completed Trips</span>
+      <strong id="wallet-completed-trips">0</strong>
+    </div>
+  </div>
+
+  <div class="wallet-transactions-card">
+    <h3>Recent Transactions</h3>
+
+    <div id="wallet-transactions">
+      <p class="wallet-empty">
+        No wallet transactions yet.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================
+     RUDOLF RIDE — WITHDRAW SCREEN
+     ========================================= -->
+<section
+  id="driver-withdraw-section"
+  class="driver-section withdraw-section"
+  style="display: none;"
+>
+  <div class="withdraw-header">
+    <button
+      type="button"
+      class="withdraw-back-btn"
+      onclick="showDriverSection('wallet')"
+    >
+      ← Back
+    </button>
+
+    <h2>Withdraw Earnings</h2>
+    <p>Send your earnings to Mobile Money</p>
+  </div>
+
+  <div class="withdraw-balance-card">
+    <span>Available to Withdraw</span>
+    <strong id="withdraw-available-balance">GH₵ 0.00</strong>
+  </div>
+
+  <div class="withdraw-form-card">
+
+    <label for="withdraw-amount">
+      Amount
+    </label>
+
+    <div class="withdraw-amount-box">
+      <span>GH₵</span>
+      <input
+        id="withdraw-amount"
+        type="number"
+        min="1"
+        step="0.01"
+        placeholder="0.00"
+        inputmode="decimal"
+      >
+    </div>
+
+    <button
+      type="button"
+      class="withdraw-all-btn"
+      onclick="setMaximumWithdrawal()"
+    >
+      Withdraw Maximum
+    </button>
+
+    <label for="withdraw-network">
+      Mobile Money Network
+    </label>
+
+    <select id="withdraw-network">
+      <option value="">Select network</option>
+      <option value="MTN MoMo">MTN MoMo</option>
+      <option value="Telecel Cash">Telecel Cash</option>
+      <option value="AT Money">AT Money</option>
+    </select>
+
+    <label for="withdraw-phone">
+      Mobile Money Number
+    </label>
+
+    <input
+      id="withdraw-phone"
+      type="tel"
+      placeholder="e.g. 024 123 4567"
+      inputmode="tel"
+    >
+
+    <label for="withdraw-name">
+      Account Name
+    </label>
+
+    <input
+      id="withdraw-name"
+      type="text"
+      placeholder="Mobile Money account name"
+    >
+
+    <button
+      type="button"
+      class="withdraw-submit-btn"
+      onclick="previewWithdrawal()"
+    >
+      Continue
+    </button>
+
+    <p class="withdraw-security-note">
+      🔒 Review your details before confirming withdrawal.
+    </p>
+
+  </div>
+</section>
+
+
+<!-- =========================================
+     RUDOLF RIDE — WITHDRAWAL REVIEW
+     ========================================= -->
+<section
+  id="driver-withdraw-review-section"
+  class="driver-section withdraw-review-section"
+  style="display: none;"
+>
+  <div class="withdraw-review-header">
+    <button
+      type="button"
+      class="withdraw-back-btn"
+      onclick="showDriverSection('withdraw')"
+    >
+      ← Edit Details
+    </button>
+
+    <h2>Review Withdrawal</h2>
+    <p>Confirm your Mobile Money withdrawal</p>
+  </div>
+
+  <div class="withdraw-review-amount">
+    <span>You are withdrawing</span>
+    <strong id="review-withdraw-amount">GH₵ 0.00</strong>
+  </div>
+
+  <div class="withdraw-review-card">
+
+    <div class="withdraw-review-row">
+      <span>Network</span>
+      <strong id="review-withdraw-network">—</strong>
+    </div>
+
+    <div class="withdraw-review-row">
+      <span>MoMo Number</span>
+      <strong id="review-withdraw-phone">—</strong>
+    </div>
+
+    <div class="withdraw-review-row">
+      <span>Account Name</span>
+      <strong id="review-withdraw-name">—</strong>
+    </div>
+
+  </div>
+
+  <div class="withdraw-review-warning">
+    🔒 Please confirm that these details are correct before withdrawing.
+  </div>
+
+  <button
+    type="button"
+    class="withdraw-confirm-btn"
+    onclick="confirmWithdrawal()"
+  >
+    Confirm Withdrawal
+  </button>
+
+  <button
+    type="button"
+    class="withdraw-edit-btn"
+    onclick="showDriverSection('withdraw')"
+  >
+    ← Edit Details
+  </button>
+</section>
+
+<nav class="driver-bottom-nav">
+  <button
+    class="nav-item active"
+    onclick="showDriverSection('home')"
+  >
+    🏠
+    <span>Home</span>
+  </button>
+
+  <button
+    class="nav-item"
+    onclick="showDriverSection('rides')"
+  >
+    📋
+    <span>Rides</span>
+  </button>
+
+  <button
+    class="nav-item"
+    onclick="showDriverSection('profile')"
+  >
+    👤
+    <span>Profile</span>
+  </button>
+
+    <button
+      class="nav-item"
+      onclick="showDriverSection('wallet')"
+    >
+      💰
+      <span>Wallet</span>
+    </button>
+</nav>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+<!-- OneSignal Web Push -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    OneSignal.Debug.setLogLevel("trace");
+
+    await OneSignal.init({
+      appId: "37313947-2360-4bf3-ab26-21310fced263",
+      serviceWorkerPath: "OneSignalSDKWorker.js"
+    });
+
+    console.log("Rudolf Ride OneSignal initialized");
+    console.log("Permission:", OneSignal.Notifications.permission);
+    console.log("Opted In:", OneSignal.User.PushSubscription.optedIn);
+    console.log("Subscription ID:", OneSignal.User.PushSubscription.id);
+    console.log("Token:", OneSignal.User.PushSubscription.token);
+  });
+</script>
+
+<!-- RUDOLF ONESIGNAL REFRESH CHECK -->
+<script>
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+OneSignalDeferred.push(async function(OneSignal) {
+  try {
+    console.log("🔄 Refreshing Rudolf Ride OneSignal components...");
+
+    if ("serviceWorker" in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+
+      for (const registration of registrations) {
+        await registration.update();
+        console.log("✅ Service worker update checked");
+      }
+    }
+
+    const permission = OneSignal.Notifications.permission;
+    const optedIn = OneSignal.User.PushSubscription.optedIn;
+    const subscriptionId = OneSignal.User.PushSubscription.id;
+    const token = OneSignal.User.PushSubscription.token;
+
+    console.log("REFRESH Permission:", permission);
+    console.log("REFRESH Opted In:", optedIn);
+    console.log("REFRESH Subscription ID:", subscriptionId);
+    console.log("REFRESH Token:", token ? "YES" : "NO");
+
+    alert(
+      "RUDOLF RIDE REFRESH COMPLETE\n\n" +
+      "Permission: " + permission + "\n" +
+      "Opted In: " + optedIn + "\n" +
+      "Subscription ID: " + subscriptionId + "\n" +
+      "Token: " + (token ? "YES" : "NO")
+    );
+
+  } catch (error) {
+    console.error("OneSignal refresh error:", error);
+    alert("OneSignal refresh error:\n" + error.message);
+  }
+});
+</script>
+
+<script type="module" src="driver-auth-guard.js"></script>
+
+<script type="module" src="firebase-config.js"></script>
+
+<script src="driver-script-test.js?v=2"></script>
+
+
+
+
+<!-- TEMPORARY FCM SETUP BUTTON -->
+<button
+  id="enable-fcm-btn"
+  type="button"
+  style="
+    position:fixed;
+    right:15px;
+    bottom:75px;
+    z-index:9999;
+    padding:12px 16px;
+    border:0;
+    border-radius:10px;
+    background:#2563eb;
+    color:white;
+    font-weight:bold;
+  "
+>
+  🔔 Enable Notifications
+</button>
+
+<script>
+document
+  .getElementById("enable-fcm-btn")
+  .addEventListener("click", async function () {
+
+    const button = this;
+
+    button.disabled = true;
+    button.textContent = "Enabling notifications...";
+
+    window.OneSignalDeferred =
+      window.OneSignalDeferred || [];
+
+    OneSignalDeferred.push(async function(OneSignal) {
+      try {
+
+        await OneSignal.Notifications.requestPermission();
+
+        console.log("BEFORE REPAIR:", {
+          optedIn: OneSignal.User.PushSubscription.optedIn,
+          id: OneSignal.User.PushSubscription.id,
+          token: OneSignal.User.PushSubscription.token
+        });
+
+        await OneSignal.User.PushSubscription.optOut();
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        await OneSignal.User.PushSubscription.optIn();
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
+        console.log("AFTER REPAIR:", {
+          optedIn: OneSignal.User.PushSubscription.optedIn,
+          id: OneSignal.User.PushSubscription.id,
+          token: OneSignal.User.PushSubscription.token
+        });
+
+        console.log(
+          "OneSignal opted in:",
+          OneSignal.User.PushSubscription.optedIn
+        );
+
+        console.log(
+          "OneSignal subscription ID:",
+          OneSignal.User.PushSubscription.id
+        );
+
+        const permission =
+          OneSignal.Notifications.permission;
+
+        const optedIn =
+          OneSignal.User.PushSubscription.optedIn;
+
+        const subscriptionId =
+          OneSignal.User.PushSubscription.id;
+
+        const token =
+          OneSignal.User.PushSubscription.token;
+
+        button.disabled = false;
+        button.textContent =
+          optedIn && subscriptionId
+            ? "✅ Notifications Enabled"
+            : "⚠️ Check Notification Status";
+
+        alert(
+          "ONESIGNAL STATUS\n\n" +
+          "Permission: " + permission + "\n" +
+          "Opted In: " + optedIn + "\n" +
+          "Subscription ID: " + subscriptionId + "\n" +
+          "Token: " + token
+        );
+
+      } catch (error) {
+
+        console.error(
+          "OneSignal opt-in error:",
+          error
+        );
+
+        button.disabled = false;
+        button.textContent =
+          "🔔 Enable Notifications";
+
+        alert(
+          "Notification setup failed: " +
+          error.message
+        );
+      }
+    });
+  });
+</script>
+
+
+<!-- RUDOLF ONESIGNAL DIAGNOSTIC -->
+<script>
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+OneSignalDeferred.push(async function(OneSignal) {
+  setTimeout(async () => {
+    try {
+      const permission = OneSignal.Notifications.permission;
+      const optedIn = OneSignal.User.PushSubscription.optedIn;
+      const subscriptionId = OneSignal.User.PushSubscription.id;
+      const token = OneSignal.User.PushSubscription.token;
+
+      alert(
+        "RUDOLF RIDE ONESIGNAL CHECK\n\n" +
+        "Permission: " + permission + "\n" +
+        "Opted In: " + optedIn + "\n" +
+        "Subscription ID: " + subscriptionId + "\n" +
+        "Token: " + (token ? "YES" : "NO")
+      );
+
+      console.log("OneSignal diagnostic:", {
+        permission,
+        optedIn,
+        subscriptionId,
+        token
+      });
+    } catch (error) {
+      alert("OneSignal diagnostic error:\n" + error.message);
+      console.error(error);
+    }
+  }, 3000);
+});
+</script>
+
 </body>
 </html>
