@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "266115753713",
+    "firebase_url": "https://rudolf-ride-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "rudolf-ride",
+    "storage_bucket": "rudolf-ride.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:266115753713:android:688f73be0a9abb33feab50",
+        "android_client_info": {
+          "package_name": "com.rudolfride.driver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBC39lgu_sg673hM2zavpEXQhacz8kti4A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

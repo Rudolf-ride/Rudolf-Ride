@@ -1578,6 +1578,9 @@ function initializeDriverApp() {
   loadTodayActivity();
   loadCurrentRide();
 
+  // RUDOLF AUTO GPS START
+  startDriverLiveLocation();
+
   setInterval(
     loadCurrentRide,
     1000
