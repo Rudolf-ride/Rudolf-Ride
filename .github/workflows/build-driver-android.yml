@@ -54,6 +54,26 @@ jobs:
           test -n "$RUDOLF_KEY_PASSWORD"
           ./gradlew assembleRelease
 
+      - name: Verify signed APK
+        run: |
+          APK="rudolf-driver-android/android/app/build/outputs/apk/release/app-release.apk"
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          APKSIGNER="$(find "$SDK/build-tools" -maxdepth 2 -type f -name apksigner | sort -V | tail -1)"
+
+          test -f "$APK"
+          test -n "$APKSIGNER"
+
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
+
+          EXPECTED="ea7d36c9414067cf3e321f5fba559b6e897d1571538fb6a87382a1f84bc39dd5"
+          ACTUAL="$("$APKSIGNER" verify --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1 | tr '[:upper:]' '[:lower:]')"
+
+          echo "Expected certificate SHA-256: $EXPECTED"
+          echo "APK certificate SHA-256:      $ACTUAL"
+
+          test "$ACTUAL" = "$EXPECTED"
+          echo "✅ APK SIGNATURE MATCHES FINAL RUDOLF DRIVER KEY"
+
       - name: Save APK
         uses: actions/upload-artifact@v4
         with:
