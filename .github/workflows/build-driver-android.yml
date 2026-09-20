@@ -66,7 +66,7 @@ jobs:
           "$APKSIGNER" verify --verbose --print-certs "$APK"
 
           EXPECTED="ea7d36c9414067cf3e321f5fba559b6e897d1571538fb6a87382a1f84bc39dd5"
-          ACTUAL="$("$APKSIGNER" verify --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1 | tr '[:upper:]' '[:lower:]')"
+          ACTUAL="$("$APKSIGNER" verify --print-certs "$APK" 2>&1 | sed -n 's/.*certificate SHA-256 digest:[[:space:]]*//p' | head -1 | tr '[:upper:]' '[:lower:]')"
 
           echo "Expected certificate SHA-256: $EXPECTED"
           echo "APK certificate SHA-256:      $ACTUAL"
