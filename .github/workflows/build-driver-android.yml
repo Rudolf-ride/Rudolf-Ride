@@ -34,12 +34,28 @@ jobs:
         working-directory: rudolf-driver-android
         run: npx cap sync android
 
+      - name: Prepare release keystore
+        env:
+          RUDOLF_KEYSTORE_B64: ${{ secrets.RUDOLF_DRIVER_KEYSTORE_BASE64 }}
+        run: |
+          test -n "$RUDOLF_KEYSTORE_B64"
+          printf '%s' "$RUDOLF_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/rudolf-driver-release.jks"
+          test -s "$RUNNER_TEMP/rudolf-driver-release.jks"
+
       - name: Build APK
         working-directory: rudolf-driver-android/android
-        run: ./gradlew assembleDebug
+        env:
+          RUDOLF_KEYSTORE_PATH: ${{ runner.temp }}/rudolf-driver-release.jks
+          RUDOLF_KEYSTORE_PASSWORD: ${{ secrets.RUDOLF_DRIVER_STORE_PASSWORD }}
+          RUDOLF_KEY_ALIAS: rudolfdriver
+          RUDOLF_KEY_PASSWORD: ${{ secrets.RUDOLF_DRIVER_KEY_PASSWORD }}
+        run: |
+          test -n "$RUDOLF_KEYSTORE_PASSWORD"
+          test -n "$RUDOLF_KEY_PASSWORD"
+          ./gradlew assembleRelease
 
       - name: Save APK
         uses: actions/upload-artifact@v4
         with:
           name: Rudolf-Ride-Driver-APK
-          path: rudolf-driver-android/android/app/build/outputs/apk/debug/app-debug.apk
+          path: rudolf-driver-android/android/app/build/outputs/apk/release/app-release.apk
