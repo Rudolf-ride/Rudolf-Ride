@@ -147,6 +147,7 @@ public class RideNotificationServiceExtension
         notification.setExtender(builder -> {
 
             builder
+                    .setContentTitle("RUDOLF FSI EXTENSION ACTIVE")
                     .setChannelId(CHANNEL_ID)
                     .setPriority(
                             NotificationCompat.PRIORITY_MAX
