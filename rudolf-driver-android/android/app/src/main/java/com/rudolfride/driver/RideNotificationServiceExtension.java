@@ -158,6 +158,7 @@ public class RideNotificationServiceExtension
                             pendingIntent,
                             true
                     );
+            return builder;
         });
     }
 }
