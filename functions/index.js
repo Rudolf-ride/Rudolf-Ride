@@ -2,20 +2,6 @@ const { onValueCreated } = require(
   "firebase-functions/v2/database"
 );
 
-const { initializeApp } = require(
-  "firebase-admin/app"
-);
-
-const { getDatabase } = require(
-  "firebase-admin/database"
-);
-
-const { getMessaging } = require(
-  "firebase-admin/messaging"
-);
-
-initializeApp();
-
 exports.sendNewRideNotification = onValueCreated(
   {
     ref: "/rudolfCurrentRide",
@@ -29,53 +15,59 @@ exports.sendNewRideNotification = onValueCreated(
       return;
     }
 
-    const tokenSnapshot = await getDatabase()
-      .ref("/driverNotificationTokens/main/token")
-      .get();
-
-    if (!tokenSnapshot.exists()) {
-      console.log("No driver notification token found.");
+    if (ride.status !== "Searching for driver") {
+      console.log(
+        "Ride is not waiting for a driver:",
+        ride.status
+      );
       return;
     }
 
-    const token = tokenSnapshot.val();
+    const pickup =
+      ride.pickup || "Passenger pickup";
 
-    const pickup = ride.pickup || "Passenger pickup";
     const destination =
       ride.destination || "Destination";
 
-    const message = {
-      token: token,
+    const fare =
+      ride.fare ?? "";
 
-      notification: {
-        title: "🚗 New Rudolf Ride Request",
-        body: `${pickup} → ${destination}`,
-      },
+    const subscriptionId =
+      "bf2d1373-e865-4df7-99ed-4b020f0fd709";
 
-      data: {
-        type: "new_ride",
-        rideId: String(
-          ride.id || ride.createdAt || ""
-        ),
-      },
-
-      webpush: {
-        notification: {
-          requireInteraction: true,
-          tag: "rudolf-new-ride",
+    const response = await fetch(
+      "https://paystack-backend-gamma.vercel.app/send-driver-notification",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          pickup,
+          destination,
+          fare,
+          subscriptionId,
+        }),
+      }
+    );
 
-        fcmOptions: {
-          link: "/driver.html",
-        },
-      },
-    };
+    const data = await response.json();
 
-    const response = await getMessaging().send(message);
+    if (!response.ok) {
+      console.error(
+        "OneSignal notification failed:",
+        response.status,
+        data
+      );
+
+      throw new Error(
+        "OneSignal notification request failed"
+      );
+    }
 
     console.log(
-      "New ride notification sent:",
-      response
+      "OneSignal driver notification sent:",
+      data
     );
   }
 );
