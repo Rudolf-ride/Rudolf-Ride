@@ -1,0 +1,172 @@
+body.rr-popup-open{overflow:hidden}
+
+#rr-ride-popup{
+ position:fixed;
+ inset:0;
+ z-index:99999;
+ display:none;
+ align-items:center;
+ justify-content:center;
+ padding:18px;
+ box-sizing:border-box
+}
+
+#rr-ride-popup.rr-show{display:flex}
+
+.rr-popup-backdrop{
+ position:absolute;
+ inset:0;
+ background:rgba(0,0,0,.72)
+}
+
+.rr-popup-card{
+ position:relative;
+ z-index:1;
+ width:min(420px,100%);
+ background:#fff;
+ border-radius:24px;
+ padding:22px;
+ box-sizing:border-box;
+ box-shadow:0 24px 70px rgba(0,0,0,.35)
+}
+
+.rr-popup-top{
+ display:flex;
+ justify-content:space-between;
+ gap:14px;
+ margin-bottom:18px
+}
+
+.rr-popup-badge{
+ display:inline-block;
+ padding:7px 11px;
+ border-radius:999px;
+ background:#e8f7ee;
+ color:#08783f;
+ font-size:12px;
+ font-weight:800
+}
+
+.rr-popup-title{
+ margin:10px 0 4px;
+ color:#17251e
+}
+
+#rr-popup-status{
+ margin:0;
+ color:#68746c
+}
+
+.rr-popup-bell{
+ font-size:28px
+}
+
+.rr-popup-route{
+ background:#f7faf8;
+ border-radius:18px;
+ padding:18px;
+ margin-bottom:15px
+}
+
+.rr-route-row{
+ display:grid;
+ grid-template-columns:18px 1fr;
+ gap:10px
+}
+
+.rr-route-dot{
+ width:12px;
+ height:12px;
+ border-radius:50%;
+ margin-top:5px
+}
+
+.rr-pickup{background:#18a85b}
+.rr-destination{background:#e94242}
+
+.rr-route-line{
+ width:2px;
+ height:27px;
+ background:#cad8cf;
+ margin:4px 0 4px 5px
+}
+
+/* Small-screen safety */
+.rr-popup-card{
+ max-height:90vh;
+ overflow-y:auto;
+}
+
+@media (max-width:360px){
+ #rr-ride-popup{
+  padding:10px;
+ }
+
+ .rr-popup-card{
+  padding:16px;
+  border-radius:18px;
+ }
+}
+
+.rr-route-row small,
+.rr-popup-info small{
+ display:block;
+ color:#748078;
+ font-size:11px;
+ font-weight:800;
+ margin-bottom:4px
+}
+
+.rr-route-row strong{
+ display:block;
+ color:#17251e;
+ font-size:16px;
+ line-height:1.35
+}
+
+.rr-popup-info{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+ margin-bottom:18px
+}
+
+.rr-popup-info>div{
+ padding:13px;
+ border:1px solid #e1e8e3;
+ border-radius:14px
+}
+
+.rr-popup-info strong{
+ color:#17251e;
+ font-size:16px
+}
+
+#rr-popup-fare{
+ color:#08783f;
+ font-size:20px
+}
+
+.rr-popup-actions{
+ display:grid;
+ grid-template-columns:1fr 1.35fr;
+ gap:10px
+}
+
+.rr-popup-actions button{
+ min-height:52px;
+ border:0;
+ border-radius:14px;
+ font-size:16px;
+ font-weight:800
+}
+
+#rr-popup-decline{
+ background:#eef1ef;
+ color:#39433d
+}
+
+#rr-popup-accept{
+ background:#16854b;
+ color:#fff
+}
