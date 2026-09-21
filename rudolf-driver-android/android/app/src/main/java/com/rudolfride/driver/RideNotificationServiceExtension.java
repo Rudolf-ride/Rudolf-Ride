@@ -22,7 +22,7 @@ public class RideNotificationServiceExtension
         implements INotificationServiceExtension {
 
     private static final String CHANNEL_ID =
-            "rudolf_ride_requests_v1";
+            "rudolf_ride_requests_v2";
 
     @Override
     public void onNotificationReceived(
