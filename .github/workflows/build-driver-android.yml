@@ -52,6 +52,8 @@ jobs:
           RUDOLF_KEYSTORE_PASSWORD: ${{ secrets.RUDOLF_DRIVER_STORE_PASSWORD }}
           RUDOLF_KEY_ALIAS: rudolf-driver
           RUDOLF_KEY_PASSWORD: ${{ secrets.RUDOLF_DRIVER_KEY_PASSWORD }}
+          RUDOLF_VERSION_CODE: ${{ github.run_number }}
+          RUDOLF_VERSION_NAME: 1.0.${{ github.run_number }}
         run: |
           test -n "$RUDOLF_KEYSTORE_PASSWORD"
           test -n "$RUDOLF_KEY_PASSWORD"
