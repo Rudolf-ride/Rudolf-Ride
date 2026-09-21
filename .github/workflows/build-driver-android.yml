@@ -1,6 +1,9 @@
 name: Build Rudolf Driver Android
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
