@@ -144,10 +144,15 @@ public class RideNotificationServiceExtension
                         PendingIntent.FLAG_IMMUTABLE
                 );
 
+        // RUDOLF_AUTOMATIC_HALF_SCREEN
+        RideRequestOverlay.show(
+                context, notificationId, pickup, destination, fare
+        );
+
         notification.setExtender(builder -> {
 
             builder
-                    .setContentTitle("RUDOLF FSI EXTENSION ACTIVE")
+                    .setContentTitle("Rudolf Ride — New ride request")
                     .setChannelId(CHANNEL_ID)
                     .setPriority(
                             NotificationCompat.PRIORITY_MAX
@@ -155,10 +160,7 @@ public class RideNotificationServiceExtension
                     .setVisibility(
                             NotificationCompat.VISIBILITY_PUBLIC
                     )
-                    .setFullScreenIntent(
-                            pendingIntent,
-                            true
-                    );
+                    .setFullScreenIntent(null, false);
             return builder;
         });
     }
