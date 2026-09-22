@@ -30,7 +30,7 @@ public final class RideRequestOverlay {
 
     public static void show(
             Context context, String id, String pickup,
-            String destination, String fare) {
+            String destination, String fare, String rideId) {
         Context app = context.getApplicationContext();
         MAIN.post(() -> {
             try {
@@ -42,7 +42,7 @@ public final class RideRequestOverlay {
                     return;
                 }
                 hide();
-                display(app, pickup, destination, fare);
+                display(app, pickup, destination, fare, rideId);
                 lastId = id;
             } catch (RuntimeException error) {
                 Log.e(TAG, "Could not display ride overlay", error);
@@ -77,7 +77,7 @@ public final class RideRequestOverlay {
     }
 
     private static void display(
-            Context app, String pickup, String destination, String fare) {
+            Context app, String pickup, String destination, String fare, String rideId) {
         Context context = new ContextThemeWrapper(
                 app, android.R.style.Theme_Material_Light_NoActionBar
         );
@@ -114,6 +114,39 @@ public final class RideRequestOverlay {
         root.addView(scroll, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
         ));
+
+        // RUDOLF_OVERLAY_ACTION_BUTTONS
+        LinearLayout actions = new LinearLayout(context);
+        actions.setOrientation(LinearLayout.HORIZONTAL);
+        actions.setPadding(dp(context, 12), dp(context, 4),
+                dp(context, 12), dp(context, 4));
+
+        Button decline = new Button(context);
+        decline.setText("DECLINE");
+        decline.setTextColor(Color.WHITE);
+        decline.setBackgroundTintList(
+                android.content.res.ColorStateList.valueOf(
+                        Color.rgb(185, 28, 28)));
+        decline.setEnabled(rideId != null && !rideId.trim().isEmpty()); decline.setOnClickListener(v -> { if (RideOverlayActions.submit(app, rideId, "decline")) hide(); });
+        actions.addView(decline, new LinearLayout.LayoutParams(
+                0, dp(context, 56), 1f));
+
+        Button accept = new Button(context);
+        accept.setText("ACCEPT");
+        accept.setTextColor(Color.WHITE);
+        accept.setBackgroundTintList(
+                android.content.res.ColorStateList.valueOf(
+                        Color.rgb(0, 150, 80)));
+        accept.setEnabled(rideId != null && !rideId.trim().isEmpty()); accept.setOnClickListener(v -> { if (RideOverlayActions.submit(app, rideId, "accept")) hide(); });
+        LinearLayout.LayoutParams acceptParams =
+                new LinearLayout.LayoutParams(
+                        0, dp(context, 56), 1f);
+        acceptParams.leftMargin = dp(context, 10);
+        actions.addView(accept, acceptParams);
+
+        root.addView(actions);
+        root.addView(text(context,
+                "Tap Accept or Decline to continue in the driver app.", 12, false));
 
         Button close = new Button(context);
         close.setText("CLOSE");

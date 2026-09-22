@@ -146,7 +146,8 @@ public class RideNotificationServiceExtension
 
         // RUDOLF_AUTOMATIC_HALF_SCREEN
         RideRequestOverlay.show(
-                context, notificationId, pickup, destination, fare
+                context, notificationId, pickup, destination, fare,
+                data != null ? data.optString("rideId", "") : ""
         );
 
         notification.setExtender(builder -> {

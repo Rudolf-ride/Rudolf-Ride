@@ -11,6 +11,7 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        registerPlugin(RideActionsPlugin.class);
         super.onCreate(savedInstanceState);
 
         // RUDOLF_OVERLAY_PERMISSION_SETUP
