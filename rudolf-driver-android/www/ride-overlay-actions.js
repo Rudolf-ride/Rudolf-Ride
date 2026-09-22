@@ -24,7 +24,7 @@ if (!ride || String(ride.rideId || "") !== String(pending.rideId)) {
 pending = null;
 alert("This request no longer matches the current ride."); return;
 }
-if (ride.status !== "Searching for driver") { pending = null; alert("This ride is no longer waiting for a driver."); return; }
+if (!isWaitingForDriver(ride.status)) { pending = null; alert("This ride is no longer waiting for a driver."); return; }
 const expiry = Number(pending.expiresAt);
 if (!Number.isFinite(expiry) || Date.now() > expiry) {
 pending = null; return;

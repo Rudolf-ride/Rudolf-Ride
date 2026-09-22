@@ -71,7 +71,7 @@
   function syncPopup() {
     if (!status) return;
 
-    if (status.textContent.trim() !== "Searching for driver") {
+    if (!isWaitingForDriver(status.textContent.trim())) {
       hidePopup();
       return;
     }
