@@ -44,6 +44,7 @@ busy = false;
 }
 }
 document.addEventListener("visibilitychange", processOverlayAction);
+document.addEventListener("rudolfCloudReady", processOverlayAction);
 setInterval(processOverlayAction, 1500);
 processOverlayAction();
 })();
