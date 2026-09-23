@@ -1955,3 +1955,12 @@ body {
   margin-bottom: 15px !important;
 }
 
+
+/* =========================================
+   RUDOLF RIDE — MAP 50% SCREEN HEIGHT
+   ========================================= */
+#driver-location-map {
+  height: 50vh !important;
+  min-height: 50vh !important;
+  max-height: 50vh !important;
+}
