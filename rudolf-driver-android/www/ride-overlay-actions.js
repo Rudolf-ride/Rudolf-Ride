@@ -20,10 +20,15 @@ pending = null; return;
 if (typeof isOnline === "undefined" || !isOnline) return;
 const ride = await window.rudolfCloud.read(CURRENT_RIDE_KEY);
 if (document.hidden) return;
-if (!ride || String(ride.rideId || "") !== String(pending.rideId)) {
-pending = null;
-alert("This request no longer matches the current ride."); return;
-}
+  if (!ride) {
+    pending = null;
+    alert("This request is no longer available."); return;
+  }
+  if (ride.rideId && String(ride.rideId) !== String(pending.rideId)) {
+    pending = null;
+    alert("This request no longer matches the current ride."); return;
+  }
+  if (!ride.rideId) ride.rideId = String(pending.rideId);
 if (!isWaitingForDriver(ride.status)) { pending = null; alert("This ride is no longer waiting for a driver."); return; }
 const expiry = Number(pending.expiresAt);
 if (!Number.isFinite(expiry) || Date.now() > expiry) {
@@ -38,7 +43,7 @@ else declineRide();
 } catch (error) {
 console.error("Overlay action failed", error);
 pending = null;
-alert("Could not process the popup action. Check the ride in the app.");
+alert("Popup handoff error: " + (error?.message || String(error)));
 } finally {
 busy = false;
 }
