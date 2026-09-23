@@ -170,3 +170,15 @@ body.rr-popup-open{overflow:hidden}
  background:#16854b;
  color:#fff
 }
+
+/* 3R: larger native ride popup — layout only */
+#rr-ride-popup{
+  padding:8px;
+}
+
+.rr-popup-card{
+  width:100%;
+  height:calc(100dvh - 16px);
+  max-height:calc(100dvh - 16px);
+  overflow-y:auto;
+}
