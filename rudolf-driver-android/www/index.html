@@ -77,6 +77,23 @@
 
 
 <main id="driver-home-section" class="driver-home">
+
+<section class="driver-location-card">
+  
+
+  <p id="driver-gps-status">
+    Waiting for GPS...
+  </p>
+        <button
+  type="button"
+  class="driver-gps-btn"
+  onclick="startDriverLiveLocation()"
+>
+  📍 Activate Driver GPS
+</button>
+
+  <div id="driver-location-map"></div>
+</section>
 <!-- Rudolf Ride payment menu -->
 <style>
 #rr-payment-menu {
@@ -203,22 +220,6 @@
       <button id="availability-btn">Go Online</button>
     </section>
     
-      <section class="driver-location-card">
-  
-
-  <p id="driver-gps-status">
-    Waiting for GPS...
-  </p>
-        <button
-  type="button"
-  class="driver-gps-btn"
-  onclick="startDriverLiveLocation()"
->
-  📍 Activate Driver GPS
-</button>
-
-  <div id="driver-location-map"></div>
-</section>
 
     <section class="activity-card">
       <div class="activity-stats">
