@@ -170,7 +170,7 @@ public final class RideRequestOverlay {
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
-                screenHeight / 2,
+                screenHeight,
                 type,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT
