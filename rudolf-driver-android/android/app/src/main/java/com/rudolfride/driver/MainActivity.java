@@ -43,22 +43,5 @@ public class MainActivity extends BridgeActivity {
         }
 
 
-        boolean allowed = true;
-
-        if (Build.VERSION.SDK_INT >= 34) {
-            NotificationManager notificationManager =
-                    getSystemService(NotificationManager.class);
-
-            allowed =
-                    notificationManager != null &&
-                    notificationManager.canUseFullScreenIntent();
-        }
-
-        Toast.makeText(
-                this,
-                "Full-screen intent allowed: " +
-                        (allowed ? "YES" : "NO"),
-                Toast.LENGTH_LONG
-        ).show();
     }
 }
