@@ -2623,3 +2623,663 @@ body {
   background: #ef4444 !important;
   color: white !important;
 }
+
+
+/* =================================================
+   3R WALLET / WITHDRAWAL PRESENTATION START
+
+   Scope:
+   - Driver Wallet
+   - Withdraw Earnings
+   - Withdrawal Review
+
+   Protected and untouched:
+   - Accept / Decline
+   - Ride popup
+   - GPS / Map
+   - Online / Offline
+   - Payment behaviour
+   - Activity / Rides
+   - Notifications
+   - Backend
+   - Bottom navigation behaviour
+   - Wallet JavaScript
+   - HTML
+================================================= */
+
+
+/* -------------------------------------------------
+   SHARED WALLET SCREEN FOUNDATION
+------------------------------------------------- */
+
+#driver-wallet-section,
+#driver-withdraw-section,
+#driver-withdraw-review-section {
+  width: 100% !important;
+  max-width: 520px !important;
+
+  margin: 0 auto !important;
+  padding: 18px 14px 105px !important;
+
+  box-sizing: border-box !important;
+
+  background: #f6f8f7 !important;
+  color: #18231c !important;
+
+  overflow-x: hidden !important;
+}
+
+#driver-wallet-section *,
+#driver-withdraw-section *,
+#driver-withdraw-review-section * {
+  box-sizing: border-box !important;
+}
+
+
+/* -------------------------------------------------
+   WALLET HEADER
+------------------------------------------------- */
+
+#driver-wallet-section .wallet-header {
+  margin: 0 0 14px !important;
+}
+
+#driver-wallet-section .wallet-header h2 {
+  margin: 0 !important;
+
+  font-size: 22px !important;
+  line-height: 28px !important;
+  font-weight: 800 !important;
+
+  color: #17241b !important;
+}
+
+#driver-wallet-section .wallet-header p {
+  margin: 3px 0 0 !important;
+
+  font-size: 13px !important;
+  line-height: 18px !important;
+
+  color: #667269 !important;
+}
+
+
+/* -------------------------------------------------
+   AVAILABLE BALANCE CARD
+------------------------------------------------- */
+
+#driver-wallet-section .wallet-balance-card {
+  width: 100% !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  margin: 0 0 12px !important;
+  padding: 18px !important;
+
+  border: 0 !important;
+  border-radius: 18px !important;
+
+  background: linear-gradient(
+    135deg,
+    #0f7a3d 0%,
+    #16a34a 100%
+  ) !important;
+
+  box-shadow: 0 7px 22px rgba(18, 92, 48, .18) !important;
+
+  color: #ffffff !important;
+}
+
+#driver-wallet-section .wallet-balance-card > span {
+  margin: 0 0 5px !important;
+
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 700 !important;
+
+  color: rgba(255,255,255,.84) !important;
+}
+
+#driver-wallet-section #wallet-balance {
+  margin: 0 0 15px !important;
+
+  font-size: 30px !important;
+  line-height: 36px !important;
+  font-weight: 900 !important;
+
+  letter-spacing: -.5px !important;
+
+  color: #ffffff !important;
+}
+
+#driver-wallet-section .wallet-withdraw-btn {
+  width: 100% !important;
+  min-height: 46px !important;
+
+  margin: 0 !important;
+  padding: 10px 14px !important;
+
+  border: 0 !important;
+  border-radius: 12px !important;
+
+  background: #ffffff !important;
+  color: #126d38 !important;
+
+  font-size: 14px !important;
+  line-height: 20px !important;
+  font-weight: 800 !important;
+
+  box-shadow: none !important;
+
+  cursor: pointer !important;
+}
+
+
+/* -------------------------------------------------
+   WALLET STATISTICS
+------------------------------------------------- */
+
+#driver-wallet-section .wallet-stats {
+  width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+
+  gap: 9px !important;
+
+  margin: 0 0 12px !important;
+}
+
+#driver-wallet-section .wallet-stat-card {
+  min-width: 0 !important;
+  min-height: 82px !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 12px !important;
+
+  border: 1px solid #e1e8e3 !important;
+  border-radius: 14px !important;
+
+  background: #ffffff !important;
+
+  box-shadow: 0 3px 12px rgba(25, 45, 31, .06) !important;
+}
+
+#driver-wallet-section .wallet-stat-card span {
+  margin: 0 0 5px !important;
+
+  font-size: 11px !important;
+  line-height: 15px !important;
+  font-weight: 700 !important;
+
+  color: #758078 !important;
+}
+
+#driver-wallet-section .wallet-stat-card strong {
+  max-width: 100% !important;
+
+  font-size: 16px !important;
+  line-height: 21px !important;
+  font-weight: 850 !important;
+
+  color: #17241b !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+
+/* -------------------------------------------------
+   WALLET TRANSACTIONS
+------------------------------------------------- */
+
+#driver-wallet-section .wallet-transactions-card {
+  width: 100% !important;
+
+  margin: 0 !important;
+  padding: 14px !important;
+
+  border: 1px solid #e1e8e3 !important;
+  border-radius: 16px !important;
+
+  background: #ffffff !important;
+
+  box-shadow: 0 3px 12px rgba(25, 45, 31, .06) !important;
+}
+
+#driver-wallet-section .wallet-transactions-card h3 {
+  margin: 0 0 11px !important;
+
+  font-size: 15px !important;
+  line-height: 20px !important;
+  font-weight: 800 !important;
+
+  color: #17241b !important;
+}
+
+#driver-wallet-section #wallet-transactions {
+  display: flex !important;
+  flex-direction: column !important;
+
+  gap: 8px !important;
+
+  width: 100% !important;
+}
+
+#driver-wallet-section #wallet-transactions > * {
+  max-width: 100% !important;
+}
+
+#driver-wallet-section .wallet-empty {
+  margin: 0 !important;
+  padding: 18px 10px !important;
+
+  text-align: center !important;
+
+  font-size: 12px !important;
+  line-height: 18px !important;
+
+  color: #7b867e !important;
+}
+
+
+/* -------------------------------------------------
+   WITHDRAW + REVIEW HEADERS
+------------------------------------------------- */
+
+#driver-withdraw-section .withdraw-header,
+#driver-withdraw-review-section .withdraw-review-header {
+  width: 100% !important;
+
+  margin: 0 0 14px !important;
+}
+
+#driver-withdraw-section .withdraw-header h2,
+#driver-withdraw-review-section .withdraw-review-header h2 {
+  margin: 11px 0 0 !important;
+
+  font-size: 22px !important;
+  line-height: 28px !important;
+  font-weight: 800 !important;
+
+  color: #17241b !important;
+}
+
+#driver-withdraw-section .withdraw-header p,
+#driver-withdraw-review-section .withdraw-review-header p {
+  margin: 3px 0 0 !important;
+
+  font-size: 13px !important;
+  line-height: 18px !important;
+
+  color: #667269 !important;
+}
+
+#driver-withdraw-section .withdraw-back-btn,
+#driver-withdraw-review-section .withdraw-back-btn {
+  min-height: 38px !important;
+
+  margin: 0 !important;
+  padding: 7px 11px !important;
+
+  border: 1px solid #dce5df !important;
+  border-radius: 10px !important;
+
+  background: #ffffff !important;
+  color: #32503d !important;
+
+  font-size: 12px !important;
+  line-height: 18px !important;
+  font-weight: 750 !important;
+}
+
+
+/* -------------------------------------------------
+   WITHDRAW AVAILABLE BALANCE
+------------------------------------------------- */
+
+#driver-withdraw-section .withdraw-balance-card,
+#driver-withdraw-review-section .withdraw-review-amount {
+  width: 100% !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  margin: 0 0 12px !important;
+  padding: 16px !important;
+
+  border: 0 !important;
+  border-radius: 16px !important;
+
+  background: #166534 !important;
+  color: #ffffff !important;
+
+  box-shadow: 0 6px 18px rgba(22, 101, 52, .16) !important;
+}
+
+#driver-withdraw-section .withdraw-balance-card span,
+#driver-withdraw-review-section .withdraw-review-amount span {
+  margin: 0 0 4px !important;
+
+  font-size: 11px !important;
+  line-height: 15px !important;
+  font-weight: 700 !important;
+
+  color: rgba(255,255,255,.82) !important;
+}
+
+#driver-withdraw-section .withdraw-balance-card strong,
+#driver-withdraw-review-section .withdraw-review-amount strong {
+  font-size: 25px !important;
+  line-height: 31px !important;
+  font-weight: 900 !important;
+
+  color: #ffffff !important;
+}
+
+
+/* -------------------------------------------------
+   WITHDRAW FORM CARD
+------------------------------------------------- */
+
+#driver-withdraw-section .withdraw-form-card {
+  width: 100% !important;
+
+  margin: 0 !important;
+  padding: 15px !important;
+
+  border: 1px solid #e1e8e3 !important;
+  border-radius: 16px !important;
+
+  background: #ffffff !important;
+
+  box-shadow: 0 3px 12px rgba(25, 45, 31, .06) !important;
+}
+
+#driver-withdraw-section .withdraw-form-card > label {
+  display: block !important;
+
+  margin: 13px 0 6px !important;
+
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 800 !important;
+
+  color: #34453a !important;
+}
+
+#driver-withdraw-section .withdraw-form-card > label:first-child {
+  margin-top: 0 !important;
+}
+
+#driver-withdraw-section .withdraw-form-card > input,
+#driver-withdraw-section .withdraw-form-card > select {
+  width: 100% !important;
+  min-height: 46px !important;
+
+  margin: 0 !important;
+  padding: 10px 12px !important;
+
+  border: 1px solid #d8e1db !important;
+  border-radius: 11px !important;
+
+  outline: none !important;
+
+  background: #fbfcfb !important;
+  color: #17241b !important;
+
+  font-size: 16px !important;
+  line-height: 22px !important;
+}
+
+#driver-withdraw-section .withdraw-amount-box {
+  width: 100% !important;
+  min-height: 48px !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  overflow: hidden !important;
+
+  margin: 0 !important;
+
+  border: 1px solid #d8e1db !important;
+  border-radius: 11px !important;
+
+  background: #fbfcfb !important;
+}
+
+#driver-withdraw-section .withdraw-amount-box > span {
+  flex: 0 0 auto !important;
+
+  padding: 0 0 0 12px !important;
+
+  font-size: 14px !important;
+  line-height: 20px !important;
+  font-weight: 800 !important;
+
+  color: #42604c !important;
+}
+
+#driver-withdraw-section .withdraw-amount-box input {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  min-height: 46px !important;
+
+  margin: 0 !important;
+  padding: 10px !important;
+
+  border: 0 !important;
+  outline: none !important;
+
+  background: transparent !important;
+  color: #17241b !important;
+
+  font-size: 16px !important;
+  line-height: 22px !important;
+}
+
+
+/* -------------------------------------------------
+   WITHDRAW BUTTONS
+------------------------------------------------- */
+
+#driver-withdraw-section .withdraw-all-btn {
+  width: 100% !important;
+  min-height: 40px !important;
+
+  margin: 7px 0 0 !important;
+  padding: 8px 12px !important;
+
+  border: 1px solid #b9d8c4 !important;
+  border-radius: 10px !important;
+
+  background: #effaf2 !important;
+  color: #13743c !important;
+
+  font-size: 12px !important;
+  line-height: 18px !important;
+  font-weight: 800 !important;
+}
+
+#driver-withdraw-section .withdraw-submit-btn,
+#driver-withdraw-review-section .withdraw-confirm-btn {
+  width: 100% !important;
+  min-height: 48px !important;
+
+  margin: 16px 0 0 !important;
+  padding: 11px 14px !important;
+
+  border: 0 !important;
+  border-radius: 12px !important;
+
+  background: #16a34a !important;
+  color: #ffffff !important;
+
+  font-size: 14px !important;
+  line-height: 20px !important;
+  font-weight: 850 !important;
+
+  box-shadow: 0 5px 14px rgba(22, 163, 74, .18) !important;
+}
+
+#driver-withdraw-section .withdraw-security-note {
+  margin: 10px 0 0 !important;
+
+  text-align: center !important;
+
+  font-size: 10px !important;
+  line-height: 15px !important;
+
+  color: #77827a !important;
+}
+
+
+/* -------------------------------------------------
+   WITHDRAW REVIEW CARD
+------------------------------------------------- */
+
+#driver-withdraw-review-section .withdraw-review-card {
+  width: 100% !important;
+
+  margin: 0 0 11px !important;
+  padding: 4px 14px !important;
+
+  border: 1px solid #e1e8e3 !important;
+  border-radius: 16px !important;
+
+  background: #ffffff !important;
+
+  box-shadow: 0 3px 12px rgba(25, 45, 31, .06) !important;
+}
+
+#driver-withdraw-review-section .withdraw-review-row {
+  width: 100% !important;
+  min-height: 54px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  gap: 12px !important;
+
+  padding: 10px 0 !important;
+
+  border-bottom: 1px solid #edf1ee !important;
+}
+
+#driver-withdraw-review-section .withdraw-review-row:last-child {
+  border-bottom: 0 !important;
+}
+
+#driver-withdraw-review-section .withdraw-review-row span {
+  flex: 0 0 auto !important;
+
+  font-size: 11px !important;
+  line-height: 16px !important;
+  font-weight: 700 !important;
+
+  color: #758078 !important;
+}
+
+#driver-withdraw-review-section .withdraw-review-row strong {
+  min-width: 0 !important;
+
+  text-align: right !important;
+
+  font-size: 13px !important;
+  line-height: 18px !important;
+  font-weight: 800 !important;
+
+  color: #17241b !important;
+
+  overflow-wrap: anywhere !important;
+}
+
+#driver-withdraw-review-section .withdraw-review-warning {
+  width: 100% !important;
+
+  margin: 0 !important;
+  padding: 11px 12px !important;
+
+  border: 1px solid #f0dfad !important;
+  border-radius: 11px !important;
+
+  background: #fffaf0 !important;
+  color: #725b20 !important;
+
+  font-size: 11px !important;
+  line-height: 17px !important;
+}
+
+#driver-withdraw-review-section .withdraw-edit-btn {
+  width: 100% !important;
+  min-height: 44px !important;
+
+  margin: 8px 0 0 !important;
+  padding: 9px 13px !important;
+
+  border: 1px solid #d8e1db !important;
+  border-radius: 11px !important;
+
+  background: #ffffff !important;
+  color: #385242 !important;
+
+  font-size: 12px !important;
+  line-height: 18px !important;
+  font-weight: 800 !important;
+}
+
+
+/* -------------------------------------------------
+   INPUT FOCUS — WALLET SCOPE ONLY
+------------------------------------------------- */
+
+#driver-withdraw-section .withdraw-form-card > input:focus,
+#driver-withdraw-section .withdraw-form-card > select:focus,
+#driver-withdraw-section .withdraw-amount-box:focus-within {
+  border-color: #49a96b !important;
+  box-shadow: 0 0 0 3px rgba(22,163,74,.10) !important;
+}
+
+
+/* -------------------------------------------------
+   EXTRA-NARROW PHONE SAFETY
+------------------------------------------------- */
+
+@media (max-width: 360px) {
+
+  #driver-wallet-section,
+  #driver-withdraw-section,
+  #driver-withdraw-review-section {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  #driver-wallet-section .wallet-stats {
+    gap: 7px !important;
+  }
+
+  #driver-wallet-section .wallet-stat-card {
+    padding: 10px !important;
+  }
+
+  #driver-wallet-section .wallet-stat-card strong {
+    font-size: 14px !important;
+    line-height: 19px !important;
+  }
+
+  #driver-wallet-section #wallet-balance {
+    font-size: 27px !important;
+    line-height: 33px !important;
+  }
+
+}
+
+
+/* ===== 3R WALLET / WITHDRAWAL PRESENTATION END ===== */
