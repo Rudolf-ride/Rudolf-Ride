@@ -63,8 +63,8 @@ public final class RideRequestOverlay {
         view.setText(value);
         view.setTextSize(size);
         view.setTextColor(Color.rgb(17, 24, 39));
-        view.setPadding(dp(context, 16), dp(context, 8),
-                dp(context, 16), dp(context, 8));
+        view.setPadding(dp(context, 16), dp(context, 6),
+                dp(context, 16), dp(context, 6));
         if (bold) {
             view.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         }
@@ -101,15 +101,15 @@ public final class RideRequestOverlay {
         details.setOrientation(LinearLayout.VERTICAL);
 
         details.addView(text(context, "PICKUP", 12, true));
-        details.addView(text(context, value(pickup, "Pickup location"), 19, false));
+        details.addView(text(context, value(pickup, "Pickup location"), 17, false));
         details.addView(text(context, "DESTINATION", 12, true));
-        details.addView(text(context, value(destination, "Destination"), 19, false));
+        details.addView(text(context, value(destination, "Destination"), 17, false));
 
         String amount = value(fare, "GH₵ --");
         if (amount.matches("[0-9]+([.][0-9]+)?")) {
             amount = "GH₵ " + amount;
         }
-        details.addView(text(context, "FARE: " + amount, 23, true));
+        details.addView(text(context, "FARE: " + amount, 21, true));
         scroll.addView(details);
         root.addView(scroll, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -171,12 +171,12 @@ public final class RideRequestOverlay {
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
-                screenHeight,
+                WindowManager.LayoutParams.WRAP_CONTENT,
                 type,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT
         );
-        params.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+        params.gravity = Gravity.CENTER;
         params.setTitle("Rudolf Ride request");
 
         panel = root;
