@@ -112,7 +112,8 @@ public final class RideRequestOverlay {
         details.addView(text(context, "FARE: " + amount, 23, true));
         scroll.addView(details);
         root.addView(scroll, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
         ));
 
         // RUDOLF_OVERLAY_ACTION_BUTTONS
