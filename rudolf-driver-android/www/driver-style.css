@@ -2341,7 +2341,7 @@ body {
 /* Activity quick tile.
    Visual layout only — existing activity data remains below. */
 
-#driver-home-section::after {
+#driver-home-section #rr-activity-btn {
   content: "📊\A Activity";
 
   white-space: pre-line !important;
@@ -2551,7 +2551,7 @@ body {
   #driver-home-section .availability-card > div,
   #driver-home-section #availability-btn,
   #driver-home-section #rr-payment-menu > summary,
-  #driver-home-section::after {
+  #driver-home-section #rr-activity-btn {
     height: 54px !important;
     min-height: 54px !important;
   }
@@ -2562,7 +2562,7 @@ body {
   }
 
   #driver-home-section #rr-payment-menu > summary::after,
-  #driver-home-section::after {
+  #driver-home-section #rr-activity-btn {
     font-size: 8px !important;
   }
 
