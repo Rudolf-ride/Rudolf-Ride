@@ -2551,3 +2551,159 @@ function confirmWithdrawal() {
 
 window.confirmWithdrawal =
   confirmWithdrawal;
+
+/* =========================================
+   3R DRIVER ACCEPTANCE RATE — ISOLATED OBSERVER
+   Does not modify ride actions or ride flow.
+   ========================================= */
+
+const DRIVER_ACCEPTANCE_STATS_KEY =
+  "rudolfDriverAcceptanceStats";
+
+function getDriverAcceptanceStats() {
+  const saved = readStoredObject(
+    DRIVER_ACCEPTANCE_STATS_KEY,
+    null
+  );
+
+  if (
+    !saved ||
+    !Number.isFinite(Number(saved.accepted)) ||
+    !Number.isFinite(Number(saved.total))
+  ) {
+    return {
+      accepted: 96,
+      total: 100,
+      decisions: {}
+    };
+  }
+
+  if (
+    !saved.decisions ||
+    typeof saved.decisions !== "object"
+  ) {
+    saved.decisions = {};
+  }
+
+  saved.accepted = Number(saved.accepted);
+  saved.total = Number(saved.total);
+
+  return saved;
+}
+
+function getAcceptanceRideKey(ride) {
+  if (!ride || typeof ride !== "object") {
+    return "";
+  }
+
+  if (ride.createdAt) {
+    return "createdAt:" + String(ride.createdAt);
+  }
+
+  if (ride.rideId) {
+    return "rideId:" + String(ride.rideId);
+  }
+
+  const fallback = [
+    ride.pickup || "",
+    ride.destination || "",
+    ride.fare || ""
+  ].join("|");
+
+  return fallback.replace(/\|/g, "")
+    ? "ride:" + fallback
+    : "";
+}
+
+function renderDriverAcceptanceRate(stats) {
+  const box =
+    document.getElementById(
+      "driver-acceptance-rate"
+    );
+
+  if (!box) {
+    return;
+  }
+
+  const percentage =
+    stats.total > 0
+      ? Math.round(
+          (stats.accepted / stats.total) * 100
+        )
+      : 100;
+
+  box.textContent =
+    percentage + "%";
+}
+
+function trackDriverAcceptanceRate() {
+  const stats =
+    getDriverAcceptanceStats();
+
+  const ride =
+    getCurrentRide();
+
+  if (
+    ride &&
+    typeof ride === "object"
+  ) {
+    const rideKey =
+      getAcceptanceRideKey(ride);
+
+    if (
+      rideKey &&
+      !stats.decisions[rideKey]
+    ) {
+      if (isAccepted(ride.status)) {
+        stats.total += 1;
+        stats.accepted += 1;
+
+        stats.decisions[rideKey] =
+          "accepted";
+
+        saveStoredObject(
+          DRIVER_ACCEPTANCE_STATS_KEY,
+          stats
+        );
+
+      } else if (
+        ride.status === "Ride declined"
+      ) {
+        stats.total += 1;
+
+        stats.decisions[rideKey] =
+          "declined";
+
+        saveStoredObject(
+          DRIVER_ACCEPTANCE_STATS_KEY,
+          stats
+        );
+      }
+    }
+  }
+
+  renderDriverAcceptanceRate(stats);
+}
+
+function startDriverAcceptanceTracker() {
+  trackDriverAcceptanceRate();
+
+  setInterval(
+    trackDriverAcceptanceRate,
+    1000
+  );
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener(
+    "DOMContentLoaded",
+    startDriverAcceptanceTracker,
+    { once: true }
+  );
+} else {
+  startDriverAcceptanceTracker();
+}
+
+/* =========================================
+   END 3R DRIVER ACCEPTANCE RATE
+   ========================================= */
