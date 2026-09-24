@@ -267,7 +267,7 @@ function renderRideButtons(ride) {
     
     buttonBox.appendChild( 
       createRideButton(
-        "Accept Ride",
+        "ACCEPT",
         "accept-btn",
         acceptRide
       )
@@ -275,7 +275,7 @@ function renderRideButtons(ride) {
 
     buttonBox.appendChild(
       createRideButton(
-        "Decline",
+        "DECLINE",
         "decline-btn",
         declineRide
       )
@@ -287,7 +287,7 @@ function renderRideButtons(ride) {
   if (isAccepted(ride.status)) {
     buttonBox.appendChild(
       createRideButton(
-        "Start Driving",
+        "START",
         "accept-btn",
         driverOnTheWay
       )
@@ -295,7 +295,7 @@ function renderRideButtons(ride) {
 
     buttonBox.appendChild(
       createRideButton(
-        "Cancel Ride",
+        "CANCEL",
         "decline-btn",
         declineRide
       )
@@ -310,7 +310,7 @@ function renderRideButtons(ride) {
   ) {
     buttonBox.appendChild(
       createRideButton(
-        "Arrived at Pickup",
+        "ARRIVED",
         "accept-btn",
         arriveAtPickup
       )
@@ -318,7 +318,7 @@ function renderRideButtons(ride) {
 
     buttonBox.appendChild(
       createRideButton(
-        "Cancel Ride",
+        "CANCEL",
         "decline-btn",
         declineRide
       )
@@ -333,7 +333,7 @@ function renderRideButtons(ride) {
   ) {
     buttonBox.appendChild(
       createRideButton(
-        "Start Trip",
+        "START TRIP",
         "accept-btn",
         startTrip
       )
@@ -341,7 +341,7 @@ function renderRideButtons(ride) {
 
     buttonBox.appendChild(
       createRideButton(
-        "Cancel Ride",
+        "CANCEL",
         "decline-btn",
         declineRide
       )
@@ -353,7 +353,7 @@ function renderRideButtons(ride) {
   if (ride.status === "Trip started") {
     buttonBox.appendChild(
       createRideButton(
-        "Complete Trip",
+        "COMPLETE",
         "accept-btn",
         completeTrip
       )
@@ -361,7 +361,7 @@ function renderRideButtons(ride) {
 
     buttonBox.appendChild(
       createRideButton(
-        "Cancel Ride",
+        "CANCEL",
         "decline-btn",
         declineRide
       )

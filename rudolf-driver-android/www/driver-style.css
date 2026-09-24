@@ -2575,3 +2575,51 @@ body {
 
 
 /* ===== 3R APPROVED SCREEN FIT END ===== */
+
+/* ===== 3R STATIC RIDE ACTION DOCK ===== */
+#rr-ride-action-dock {
+  position: fixed !important;
+  left: 8px !important;
+  right: 8px !important;
+  bottom: 78px !important;
+  z-index: 2300 !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+
+  padding: 6px !important;
+  margin: 0 !important;
+
+  background: rgba(255,255,255,.98) !important;
+  border-radius: 15px !important;
+  box-shadow: 0 -4px 18px rgba(0,0,0,.16) !important;
+}
+
+#rr-ride-action-dock:empty {
+  display: none !important;
+}
+
+#rr-ride-action-dock button {
+  width: 100% !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  margin: 0 !important;
+  padding: 5px 8px !important;
+
+  border: 0 !important;
+  border-radius: 11px !important;
+
+  font-size: 13px !important;
+  font-weight: 800 !important;
+}
+
+#rr-ride-action-dock .accept-btn {
+  background: #16a34a !important;
+  color: white !important;
+}
+
+#rr-ride-action-dock .decline-btn {
+  background: #ef4444 !important;
+  color: white !important;
+}
