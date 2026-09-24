@@ -111,9 +111,12 @@ public final class RideRequestOverlay {
         }
         details.addView(text(context, "FARE: " + amount, 21, true));
         scroll.addView(details);
+        scroll.setFillViewport(true);
+
         root.addView(scroll, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                0,
+                1f
         ));
 
         // RUDOLF_OVERLAY_ACTION_BUTTONS
@@ -171,12 +174,12 @@ public final class RideRequestOverlay {
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
                 type,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT
         );
-        params.gravity = Gravity.CENTER;
+        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
         params.setTitle("Rudolf Ride request");
 
         panel = root;
