@@ -3283,3 +3283,29 @@ body {
 
 
 /* ===== 3R WALLET / WITHDRAWAL PRESENTATION END ===== */
+
+/* ===== 3R 2-ERROR PRESENTATION PATCH START ===== */
+
+#driver-rides-section{width:100%!important;max-width:520px!important;margin:0 auto!important;padding:18px 14px 105px!important;box-sizing:border-box!important;background:#f6f8f7!important;color:#18231c!important;overflow-x:hidden!important;}
+#driver-rides-section *{box-sizing:border-box!important;}
+#driver-rides-section .section-title{margin:0 0 14px!important;}
+#driver-rides-section .section-title h2{margin:0!important;font-size:22px!important;line-height:28px!important;font-weight:800!important;color:#17241b!important;}
+#driver-rides-section .section-title p{margin:3px 0 0!important;font-size:13px!important;line-height:18px!important;color:#667269!important;}
+#driver-rides-list{width:100%!important;display:flex!important;flex-direction:column!important;gap:12px!important;}
+#driver-rides-section .ride-history-card,#driver-rides-section .ride-card{width:100%!important;min-width:0!important;margin:0!important;padding:15px!important;border:1px solid #e1e8e3!important;border-radius:16px!important;background:#fff!important;box-shadow:0 3px 12px rgba(25,45,31,.06)!important;overflow:hidden!important;}
+#driver-rides-section .ride-card h3{margin:0 0 12px!important;font-size:16px!important;line-height:22px!important;font-weight:800!important;color:#17241b!important;overflow-wrap:anywhere!important;}
+#driver-rides-section .ride-card p{margin:0 0 7px!important;font-size:13px!important;line-height:19px!important;color:#59665d!important;overflow-wrap:anywhere!important;}
+#driver-rides-section .ride-card p strong{color:#26352b!important;font-weight:800!important;}
+#driver-rides-section .ride-view-details-btn{width:100%!important;min-height:44px!important;margin:8px 0 0!important;padding:10px 14px!important;border:0!important;border-radius:12px!important;background:#15803d!important;color:#fff!important;font-size:13px!important;line-height:18px!important;font-weight:800!important;}
+#driver-rides-section .empty-rides{width:100%!important;margin:0!important;padding:28px 16px!important;border:1px solid #e1e8e3!important;border-radius:16px!important;background:#fff!important;text-align:center!important;box-shadow:0 3px 12px rgba(25,45,31,.06)!important;}
+#driver-rides-section .empty-rides h3,#driver-rides-section .empty-rides strong{color:#17241b!important;font-size:15px!important;line-height:20px!important;font-weight:800!important;}
+#driver-rides-section .empty-rides p{margin:5px 0 0!important;color:#7b867e!important;font-size:12px!important;line-height:18px!important;}
+
+#driver-wallet-section .wallet-transaction{width:100%!important;min-width:0!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(105px,42%)!important;gap:10px!important;margin:0!important;padding:12px!important;border:1px solid #e7ece8!important;border-radius:12px!important;background:#f9fbfa!important;}
+#driver-wallet-section .wallet-transaction>div{min-width:0!important;display:flex!important;flex-direction:column!important;gap:3px!important;}
+#driver-wallet-section .wallet-transaction>div:last-child{align-items:flex-end!important;text-align:right!important;}
+#driver-wallet-section .wallet-transaction strong{display:block!important;margin:0!important;font-size:12px!important;line-height:17px!important;font-weight:800!important;color:#1d2d22!important;overflow-wrap:anywhere!important;}
+#driver-wallet-section .wallet-transaction span{display:block!important;margin:0!important;font-size:10px!important;line-height:15px!important;color:#748078!important;overflow-wrap:anywhere!important;word-break:break-word!important;}
+@media(max-width:380px){#driver-rides-section{padding-left:10px!important;padding-right:10px!important;}#driver-wallet-section .wallet-transaction{grid-template-columns:1fr!important;gap:8px!important;padding:10px!important;}#driver-wallet-section .wallet-transaction>div:last-child{align-items:flex-start!important;text-align:left!important;}}
+
+/* ===== 3R 2-ERROR PRESENTATION PATCH END ===== */
