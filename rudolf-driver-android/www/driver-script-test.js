@@ -1476,10 +1476,11 @@ function showDriverSection(section) {
     );
 
   if (homeSection) {
-    homeSection.style.display =
-      section === "home"
-        ? "block"
-        : "none";
+    homeSection.style.setProperty(
+      "display",
+      section === "home" ? "grid" : "none",
+      "important"
+    );
   }
 
   if (ridesSection) {
