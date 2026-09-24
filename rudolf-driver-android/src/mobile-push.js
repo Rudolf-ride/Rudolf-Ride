@@ -57,7 +57,7 @@ async function startMobilePush() {
   window.rudolfMobilePush = OneSignal;
 
   button.disabled = false;
-  button.textContent = "Enable Notifications";
+  button.textContent = "🔔";
 
   button.addEventListener("click", async () => {
     button.disabled = true;
