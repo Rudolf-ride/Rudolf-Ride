@@ -767,7 +767,7 @@ function showCompletedRideReceipt(ride) {
     "box-sizing:border-box;background:#f0f5f4;color:#172b26;" +
     "padding:8px;padding-top:max(8px,env(safe-area-inset-top));" +
     "padding-bottom:max(8px,env(safe-area-inset-bottom));" +
-    "font:700 14px/1.3 system-ui,sans-serif;overscroll-behavior:contain;";
+    "font:700 15px/1.3 system-ui,sans-serif;overscroll-behavior:contain;";
 
   const card = document.createElement("div");
   card.style.cssText =
@@ -787,15 +787,15 @@ function showCompletedRideReceipt(ride) {
   function row(label, value) {
     const line = document.createElement("div");
     line.style.cssText =
-      "display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px;align-items:start;padding:7px 0;border-bottom:1px solid #e5ece9;";
+      "display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px;align-items:center;padding:10px 0;flex:1 0 auto;border-bottom:1px solid #e5ece9;";
     const title = document.createElement("div");
     title.textContent = label;
-    title.style.cssText = "font-size:12px;font-weight:700;color:#172b26;";
+    title.style.cssText = "font-size:14px;font-weight:700;color:#172b26;";
     const detail = document.createElement("div");
     detail.textContent =
       value === undefined || value === null || value === ""
         ? "Not available" : String(value);
-    detail.style.cssText = "min-width:0;font-size:14px;font-weight:700;";
+    detail.style.cssText = "min-width:0;font-size:15px;font-weight:700;";
     line.appendChild(title);
     line.appendChild(detail);
     card.appendChild(line);
@@ -831,10 +831,10 @@ function showCompletedRideReceipt(ride) {
   text("div", money(ride.driverEarnings),
     "font-size:28px;font-weight:800;color:#13754b;");
   text("p", "Trip details saved in Ride History.",
-    "font-size:12px;font-weight:700;color:#172b26;margin:6px 0 10px;");
+    "font-size:14px;font-weight:700;color:#172b26;margin:6px 0 10px;");
 
   const done = text("button", "DONE",
-    "display:block;position:static;width:100%;min-height:44px;margin-top:auto;flex-shrink:0;" +
+    "display:block;position:static;width:100%;min-height:44px;margin-top:10px;flex-shrink:0;" +
     "border:0;border-radius:12px;background:#13754b;color:white;" +
     "font:700 16px system-ui;cursor:pointer;padding:10px;");
   done.type = "button";
