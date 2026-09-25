@@ -104,13 +104,15 @@ public final class RideRequestOverlay {
         details.addView(text(context, value(pickup, "Pickup location"), 22, false));
 
         // 3R DYNAMIC RIDE TYPE — NEW VIEW ONLY
-        String rideKey = value(rideType, "Rudolf Ride").toLowerCase(java.util.Locale.ROOT);
+        String rideKey = value(rideType, "").toLowerCase(java.util.Locale.ROOT);
 
-        String rideCard =
-                rideKey.contains("comfort") ? "🚙\nRudolf Comfort\nExtra comfort for your journey" :
-                rideKey.contains("xl") ? "🚐\nRudolf XL\nMore space for passengers and luggage" :
-                rideKey.contains("economy") ? "🚘\nRudolf Economy\nAffordable everyday ride" :
-                "🚘\nRudolf Ride\nPassenger selected ride";
+        String selectedRideType =
+                rideKey.contains("comfort") ? "Comfort" :
+                rideKey.contains("xl") ? "XL" :
+                rideKey.contains("economy") ? "Economy" :
+                value(rideType, "Rudolf Ride");
+
+        String rideCard = "🚗 Rudolf Ride\n" + selectedRideType;
 
         TextView rideTypeView = text(context, rideCard, 18, false);
         rideTypeView.setGravity(android.view.Gravity.CENTER);
