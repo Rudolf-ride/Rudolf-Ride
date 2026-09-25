@@ -750,6 +750,118 @@ function startTrip() {
   changeRideStatus("Trip started");
 }
 
+
+// 3R RECEIPT START — display existing completed-ride data only
+function showCompletedRideReceipt(ride) {
+  const receiptId = "rudolf-completed-ride-receipt";
+  if (document.getElementById(receiptId)) return;
+
+  const previousFocus = document.activeElement;
+  const overlay = document.createElement("div");
+  overlay.id = receiptId;
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-labelledby", receiptId + "-title");
+  overlay.style.cssText =
+    "position:fixed;inset:0;z-index:100000;overflow:auto;" +
+    "box-sizing:border-box;background:#f0f5f4;color:#172b26;" +
+    "padding:24px 16px;padding-top:max(24px,env(safe-area-inset-top));" +
+    "padding-bottom:max(24px,env(safe-area-inset-bottom));" +
+    "font:16px/1.5 system-ui,sans-serif;overscroll-behavior:contain;";
+
+  const card = document.createElement("div");
+  card.style.cssText =
+    "box-sizing:border-box;max-width:440px;margin:0 auto;" +
+    "padding:24px;background:white;border-radius:20px;" +
+    "box-shadow:0 8px 30px #123b2318;overflow-wrap:anywhere;";
+  overlay.appendChild(card);
+
+  function text(tag, value, css) {
+    const el = document.createElement(tag);
+    el.textContent = value;
+    el.style.cssText = css || "";
+    card.appendChild(el);
+    return el;
+  }
+
+  function row(label, value) {
+    const line = document.createElement("div");
+    line.style.cssText =
+      "padding:11px 0;border-bottom:1px solid #e5ece9;";
+    const title = document.createElement("div");
+    title.textContent = label;
+    title.style.cssText = "font-size:12px;color:#60736b;";
+    const detail = document.createElement("div");
+    detail.textContent =
+      value === undefined || value === null || value === ""
+        ? "Not available" : String(value);
+    detail.style.cssText = "font-size:16px;font-weight:600;";
+    line.appendChild(title);
+    line.appendChild(detail);
+    card.appendChild(line);
+  }
+
+  function money(value) {
+    if (value === undefined || value === null || value === "") {
+      return "Not available";
+    }
+    const amount = Number(value);
+    return Number.isFinite(amount)
+      ? "GH₵ " + amount.toFixed(2) : "Not available";
+  }
+
+  text("div", "RUDOLF RIDE",
+    "color:#13754b;font-weight:800;letter-spacing:2px;");
+  const heading = text("h2", "Trip receipt",
+    "margin:8px 0;font-size:28px;color:#172b26;");
+  heading.id = receiptId + "-title";
+  text("p", "✓ Trip completed",
+    "margin:0 0 16px;color:#13754b;font-weight:600;");
+
+  row("Completed", ride.completedDateTime);
+  row("Trip ID", ride.rideId);
+  row("Pickup", ride.pickup);
+  row("Destination", ride.destination);
+  row("Ride type", ride.rideType);
+  row("Total fare", money(ride.totalFare));
+  row("Platform fee (15%)", money(ride.platformFee));
+
+  text("div", "Your earnings (85%)",
+    "margin-top:20px;color:#13754b;font-weight:600;");
+  text("div", money(ride.driverEarnings),
+    "font-size:34px;font-weight:800;color:#13754b;");
+  text("p", "Trip details saved in Ride History.",
+    "font-size:13px;color:#60736b;margin:12px 0 20px;");
+
+  const done = text("button", "DONE",
+    "display:block;position:static;width:100%;min-height:50px;" +
+    "border:0;border-radius:12px;background:#13754b;color:white;" +
+    "font:700 16px system-ui;cursor:pointer;padding:14px;");
+  done.type = "button";
+
+  function closeReceipt() {
+    overlay.remove();
+    if (previousFocus && previousFocus.isConnected) {
+      previousFocus.focus();
+    }
+  }
+
+  done.addEventListener("click", closeReceipt);
+  overlay.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeReceipt();
+    } else if (event.key === "Tab") {
+      event.preventDefault();
+      done.focus();
+    }
+  });
+
+  document.body.appendChild(overlay);
+  done.focus({ preventScroll: true });
+}
+// 3R RECEIPT END
+
 function completeTrip() {
   const ride = getCurrentRide();
 
@@ -822,6 +934,13 @@ window.rudolfCloud.write(
   CURRENT_RIDE_KEY,
   ride
 );
+
+  // 3R: receipt failure must not interrupt trip cleanup.
+  try {
+    showCompletedRideReceipt(ride);
+  } catch (error) {
+    console.error("Receipt display failed:", error);
+  }
 
   // Clear after passenger receives completed status
   setTimeout(function () {
