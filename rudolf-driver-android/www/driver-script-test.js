@@ -826,9 +826,9 @@ function showCompletedRideReceipt(ride) {
   row("Total fare", money(ride.totalFare));
   row("Platform fee (15%)", money(ride.platformFee));
 
-  text("div", "Your earnings (85%)",
+  text("div", "Total fare",
     "margin-top:10px;color:#13754b;font-weight:700;");
-  text("div", money(ride.driverEarnings),
+  text("div", money(ride.totalFare),
     "font-size:28px;font-weight:800;color:#13754b;");
   text("p", "Trip details saved in Ride History.",
     "font-size:14px;font-weight:700;color:#172b26;margin:6px 0 10px;");
