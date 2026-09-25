@@ -91,7 +91,7 @@ public final class RideRequestOverlay {
         root.setBackgroundColor(Color.WHITE);
         root.setElevation(dp(context, 12));
 
-        TextView title = text(context, "Rudolf Ride — NEW REQUEST", 20, true);
+        TextView title = text(context, "Rudolf Ride — NEW REQUEST", 24, true);
         title.setTextColor(Color.WHITE);
         title.setBackgroundColor(Color.rgb(0, 150, 80));
         root.addView(title);
@@ -100,16 +100,24 @@ public final class RideRequestOverlay {
         LinearLayout details = new LinearLayout(context);
         details.setOrientation(LinearLayout.VERTICAL);
 
-        details.addView(text(context, "PICKUP", 12, true));
-        details.addView(text(context, value(pickup, "Pickup location"), 17, false));
-        details.addView(text(context, "DESTINATION", 12, true));
-        details.addView(text(context, value(destination, "Destination"), 17, false));
+        details.addView(text(context, "PICKUP", 16, true));
+        details.addView(text(context, value(pickup, "Pickup location"), 22, false));
+
+        View detailSpacer = new View(context);
+        details.addView(detailSpacer, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0,
+                1f
+        ));
+
+        details.addView(text(context, "DESTINATION", 16, true));
+        details.addView(text(context, value(destination, "Destination"), 26, false));
 
         String amount = value(fare, "GH₵ --");
         if (amount.matches("[0-9]+([.][0-9]+)?")) {
             amount = "GH₵ " + amount;
         }
-        details.addView(text(context, "FARE: " + amount, 21, true));
+        details.addView(text(context, "FARE: " + amount, 27, true));
         scroll.addView(details);
         scroll.setFillViewport(true);
 
@@ -150,10 +158,11 @@ public final class RideRequestOverlay {
 
         root.addView(actions);
         root.addView(text(context,
-                "Tap Accept or Decline to continue in the driver app.", 12, false));
+                "Tap Accept or Decline to continue in the driver app.", 14, false));
 
         Button close = new Button(context);
         close.setText("CLOSE");
+        close.setTextSize(18);
         close.setOnClickListener(view -> hide());
         root.addView(close, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(context, 52)
