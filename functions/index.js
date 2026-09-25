@@ -32,6 +32,15 @@ exports.sendNewRideNotification = onValueCreated(
     const fare =
       ride.fare ?? "";
 
+
+    const rideType =
+
+      ride.rideType ||
+
+      ride.selectedRide ||
+
+      "Rudolf Ride";
+
     const subscriptionId =
       "bf2d1373-e865-4df7-99ed-4b020f0fd709";
 
@@ -46,6 +55,7 @@ exports.sendNewRideNotification = onValueCreated(
           pickup,
           destination,
           fare,
+          rideType,
           subscriptionId,
         }),
       }

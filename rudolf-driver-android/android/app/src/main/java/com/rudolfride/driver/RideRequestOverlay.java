@@ -30,7 +30,7 @@ public final class RideRequestOverlay {
 
     public static void show(
             Context context, String id, String pickup,
-            String destination, String fare, String rideId) {
+            String destination, String fare, String rideType, String rideId) {
         Context app = context.getApplicationContext();
         MAIN.post(() -> {
             try {
@@ -42,7 +42,7 @@ public final class RideRequestOverlay {
                     return;
                 }
                 hide();
-                display(app, pickup, destination, fare, rideId);
+                display(app, pickup, destination, fare, rideType, rideId);
                 lastId = id;
             } catch (RuntimeException error) {
                 Log.e(TAG, "Could not display ride overlay", error);
@@ -77,7 +77,7 @@ public final class RideRequestOverlay {
     }
 
     private static void display(
-            Context app, String pickup, String destination, String fare, String rideId) {
+            Context app, String pickup, String destination, String fare, String rideType, String rideId) {
         Context context = new ContextThemeWrapper(
                 app, android.R.style.Theme_Material_Light_NoActionBar
         );
@@ -102,6 +102,22 @@ public final class RideRequestOverlay {
 
         details.addView(text(context, "PICKUP", 16, true));
         details.addView(text(context, value(pickup, "Pickup location"), 22, false));
+
+        // 3R DYNAMIC RIDE TYPE — NEW VIEW ONLY
+        String rideKey = value(rideType, "Rudolf Ride").toLowerCase(java.util.Locale.ROOT);
+
+        String rideCard =
+                rideKey.contains("comfort") ? "🚙\nRudolf Comfort\nExtra comfort for your journey" :
+                rideKey.contains("xl") ? "🚐\nRudolf XL\nMore space for passengers and luggage" :
+                rideKey.contains("economy") ? "🚘\nRudolf Economy\nAffordable everyday ride" :
+                "🚘\nRudolf Ride\nPassenger selected ride";
+
+        TextView rideTypeView = text(context, rideCard, 18, false);
+        rideTypeView.setGravity(android.view.Gravity.CENTER);
+        rideTypeView.setPadding(dp(context, 16), dp(context, 18),
+                dp(context, 16), dp(context, 10));
+
+        details.addView(rideTypeView);
 
         View detailSpacer = new View(context);
         details.addView(detailSpacer, new LinearLayout.LayoutParams(
