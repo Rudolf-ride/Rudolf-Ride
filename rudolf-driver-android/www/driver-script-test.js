@@ -655,10 +655,14 @@ function changeRideStatus(newStatus) {
 
   if (newStatus === "Driver accepted your ride") {
 
+    const driverProfile = JSON.parse(
+      localStorage.getItem("rudolfDriverProfile") || "{}"
+    );
+
     ride.driver = {
-      name: "Rudolf",
-      vehicle: "Toyota Corolla",
-      plate: "GR 12345",
+      name: driverProfile.name || "Rudolf",
+      vehicle: driverProfile.vehicle || "Toyota Corolla",
+      plate: driverProfile.plate || "GR 12345",
       rating: 4.8
     };
 
