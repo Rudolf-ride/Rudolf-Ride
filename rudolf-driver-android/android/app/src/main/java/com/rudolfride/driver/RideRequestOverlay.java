@@ -114,15 +114,22 @@ public final class RideRequestOverlay {
 
         String rideCard = "🚗 Rudolf Ride\n" + selectedRideType;
 
-        TextView rideTypeView = text(context, rideCard, 18, false);
+        View rideTopSpacer = new View(context);
+        details.addView(rideTopSpacer, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0,
+                1f
+        ));
+
+        TextView rideTypeView = text(context, rideCard, 24, true);
         rideTypeView.setGravity(android.view.Gravity.CENTER);
         rideTypeView.setPadding(dp(context, 16), dp(context, 18),
                 dp(context, 16), dp(context, 10));
 
         details.addView(rideTypeView);
 
-        View detailSpacer = new View(context);
-        details.addView(detailSpacer, new LinearLayout.LayoutParams(
+        View rideBottomSpacer = new View(context);
+        details.addView(rideBottomSpacer, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 0,
                 1f
