@@ -763,15 +763,15 @@ function showCompletedRideReceipt(ride) {
   overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-labelledby", receiptId + "-title");
   overlay.style.cssText =
-    "position:fixed;inset:0;z-index:100000;overflow:auto;" +
+    "position:fixed;inset:0;z-index:100000;overflow:auto;display:flex;flex-direction:column;" +
     "box-sizing:border-box;background:#f0f5f4;color:#172b26;" +
     "padding:8px;padding-top:max(8px,env(safe-area-inset-top));" +
     "padding-bottom:max(8px,env(safe-area-inset-bottom));" +
-    "font:14px/1.3 system-ui,sans-serif;overscroll-behavior:contain;";
+    "font:700 14px/1.3 system-ui,sans-serif;overscroll-behavior:contain;";
 
   const card = document.createElement("div");
   card.style.cssText =
-    "box-sizing:border-box;max-width:440px;margin:0 auto;" +
+    "box-sizing:border-box;width:100%;max-width:440px;margin:0 auto;flex:1 0 auto;display:flex;flex-direction:column;" +
     "padding:14px;background:white;border-radius:16px;" +
     "box-shadow:0 8px 30px #123b2318;overflow-wrap:anywhere;";
   overlay.appendChild(card);
@@ -790,12 +790,12 @@ function showCompletedRideReceipt(ride) {
       "display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px;align-items:start;padding:7px 0;border-bottom:1px solid #e5ece9;";
     const title = document.createElement("div");
     title.textContent = label;
-    title.style.cssText = "font-size:12px;color:#60736b;";
+    title.style.cssText = "font-size:12px;font-weight:700;color:#172b26;";
     const detail = document.createElement("div");
     detail.textContent =
       value === undefined || value === null || value === ""
         ? "Not available" : String(value);
-    detail.style.cssText = "min-width:0;font-size:14px;font-weight:600;";
+    detail.style.cssText = "min-width:0;font-size:14px;font-weight:700;";
     line.appendChild(title);
     line.appendChild(detail);
     card.appendChild(line);
@@ -813,10 +813,10 @@ function showCompletedRideReceipt(ride) {
   text("div", "RUDOLF RIDE",
     "color:#13754b;font-weight:800;letter-spacing:2px;");
   const heading = text("h2", "Trip receipt",
-    "margin:4px 0;font-size:23px;color:#172b26;");
+    "margin:4px 0;font-size:23px;font-weight:800;color:#172b26;");
   heading.id = receiptId + "-title";
   text("p", "✓ Trip completed",
-    "margin:0 0 8px;color:#13754b;font-weight:600;");
+    "margin:0 0 8px;color:#13754b;font-weight:700;");
 
   row("Completed", ride.completedDateTime);
   row("Trip ID", ride.rideId);
@@ -827,14 +827,14 @@ function showCompletedRideReceipt(ride) {
   row("Platform fee (15%)", money(ride.platformFee));
 
   text("div", "Your earnings (85%)",
-    "margin-top:10px;color:#13754b;font-weight:600;");
+    "margin-top:10px;color:#13754b;font-weight:700;");
   text("div", money(ride.driverEarnings),
     "font-size:28px;font-weight:800;color:#13754b;");
   text("p", "Trip details saved in Ride History.",
-    "font-size:12px;color:#60736b;margin:6px 0 10px;");
+    "font-size:12px;font-weight:700;color:#172b26;margin:6px 0 10px;");
 
   const done = text("button", "DONE",
-    "display:block;position:static;width:100%;min-height:44px;" +
+    "display:block;position:static;width:100%;min-height:44px;margin-top:auto;flex-shrink:0;" +
     "border:0;border-radius:12px;background:#13754b;color:white;" +
     "font:700 16px system-ui;cursor:pointer;padding:10px;");
   done.type = "button";
