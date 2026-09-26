@@ -56,6 +56,7 @@ exports.sendNewRideNotification = onValueCreated(
           destination,
           fare,
           rideType,
+          rideId: String(ride.id || ride.createdAt || ""),
           subscriptionId,
         }),
       }
