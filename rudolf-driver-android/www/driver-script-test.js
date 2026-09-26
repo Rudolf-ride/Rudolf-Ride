@@ -3205,7 +3205,7 @@ function renderDeclinedRideHistory() {
     );
   });
 
-  list.prepend(section);
+  list.appendChild(section);
 }
 
 // =====================================
