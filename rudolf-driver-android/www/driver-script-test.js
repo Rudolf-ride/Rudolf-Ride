@@ -713,6 +713,7 @@ function declineRide() {
   // 3R ADDITIVE — history failure must never interrupt decline.
   try {
     saveDeclinedRideHistory(ride);
+    renderDriverRides();
   } catch (error) {
     console.error(
       "Declined ride history save failed:",
