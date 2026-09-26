@@ -3128,8 +3128,30 @@ function renderDeclinedRideHistory() {
     oldSection.remove();
   }
 
+  // 3R: a completed ride must never appear as declined.
+  const completedRides =
+    getDriverRides();
+
   const declinedRides =
     getDeclinedDriverRides()
+      .filter(function (declinedRide) {
+        return !completedRides.some(function (completedRide) {
+          return (
+            (
+              declinedRide.rideId &&
+              completedRide.rideId &&
+              String(declinedRide.rideId) ===
+              String(completedRide.rideId)
+            ) ||
+            (
+              declinedRide.createdAt &&
+              completedRide.createdAt &&
+              String(declinedRide.createdAt) ===
+              String(completedRide.createdAt)
+            )
+          );
+        });
+      })
       .slice()
       .reverse();
 
