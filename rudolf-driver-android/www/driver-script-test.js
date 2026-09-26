@@ -3213,6 +3213,80 @@ function renderDeclinedRideHistory() {
 // =====================================
 
 // =====================================
+// 3R TEMP COMPLETED-RIDE RUNTIME DIAGNOSTIC START
+// Diagnostic only. No ride behaviour is changed.
+// =====================================
+function render3RCompletedRideDiagnostic() {
+  const list =
+    document.getElementById("driver-rides-list");
+
+  if (!list) {
+    return;
+  }
+
+  const oldBox =
+    document.getElementById(
+      "rr-3r-completed-diagnostic"
+    );
+
+  if (oldBox) {
+    oldBox.remove();
+  }
+
+  const completedRides =
+    getDriverRides();
+
+  const declinedRides =
+    getDeclinedDriverRides();
+
+  const rawCompleted =
+    localStorage.getItem(
+      DRIVER_RIDES_KEY
+    );
+
+  const lastCompleted =
+    completedRides.length
+      ? completedRides[
+          completedRides.length - 1
+        ]
+      : null;
+
+  const box =
+    document.createElement("div");
+
+  box.id =
+    "rr-3r-completed-diagnostic";
+
+  box.style.cssText =
+    "width:100%;box-sizing:border-box;" +
+    "padding:10px;margin:0 0 10px;" +
+    "border:2px dashed #111;" +
+    "border-radius:10px;background:#fff6cc;" +
+    "color:#111;font-size:12px;" +
+    "font-weight:800;line-height:18px;";
+
+  box.textContent =
+    "3R DIAGNOSTIC — Completed stored: " +
+    completedRides.length +
+    " | Declined stored: " +
+    declinedRides.length +
+    " | Raw completed key: " +
+    (rawCompleted ? "YES" : "NO") +
+    " | Last status: " +
+    (
+      lastCompleted &&
+      lastCompleted.status
+        ? lastCompleted.status
+        : "NONE"
+    );
+
+  list.prepend(box);
+}
+// =====================================
+// 3R TEMP COMPLETED-RIDE RUNTIME DIAGNOSTIC END
+// =====================================
+
+// =====================================
 // 3R DECLINED HISTORY — CONNECTION START
 // Original My Rides renderer remains unchanged.
 // =====================================
@@ -3227,6 +3301,15 @@ renderDriverRides = function () {
   } catch (error) {
     console.error(
       "Declined history render failed:",
+      error
+    );
+  }
+
+  try {
+    render3RCompletedRideDiagnostic();
+  } catch (error) {
+    console.error(
+      "3R completed diagnostic failed:",
       error
     );
   }
