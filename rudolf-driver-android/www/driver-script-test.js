@@ -3074,6 +3074,12 @@ function createDeclinedRideCard(ride) {
     "Ride declined"
   );
 
+  if (card.lastElementChild) {
+    card.lastElementChild.classList.add(
+      "declined-status-line"
+    );
+  }
+
   addRideDetail(
     card,
     "Date",
@@ -3154,7 +3160,7 @@ function renderDeclinedRideHistory() {
     );
   });
 
-  list.appendChild(section);
+  list.prepend(section);
 }
 
 // =====================================
