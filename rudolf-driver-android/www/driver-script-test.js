@@ -710,6 +710,16 @@ function declineRide() {
 
   saveCurrentRide(ride);
 
+  // 3R ADDITIVE — history failure must never interrupt decline.
+  try {
+    saveDeclinedRideHistory(ride);
+  } catch (error) {
+    console.error(
+      "Declined ride history save failed:",
+      error
+    );
+  }
+
   const rideStatus =
     document.getElementById(
       "ride-status"
@@ -2830,3 +2840,350 @@ if (document.readyState === "loading") {
 /* =========================================
    END 3R DRIVER ACCEPTANCE RATE
    ========================================= */
+
+// =====================================
+// 3R DECLINED HISTORY — STORAGE START
+// Separate from completed ride storage.
+// =====================================
+
+const DRIVER_DECLINED_RIDES_KEY =
+  "rudolfDriverDeclinedRides";
+
+function getDeclinedDriverRides() {
+  const rides = readStoredObject(
+    DRIVER_DECLINED_RIDES_KEY,
+    []
+  );
+
+  return Array.isArray(rides) ? rides : [];
+}
+
+function getDeclinedRideHistoryId(ride) {
+  if (!ride) return "";
+
+  return String(
+    ride.rideId ||
+    ride.createdAt ||
+    [
+      ride.pickup || "",
+      ride.destination || "",
+      ride.fare || ""
+    ].join("|")
+  );
+}
+
+function saveDeclinedRideHistory(ride) {
+  if (!ride || ride.status !== "Ride declined") {
+    return false;
+  }
+
+  const rides = getDeclinedDriverRides();
+  const rideId = getDeclinedRideHistoryId(ride);
+
+  const alreadySaved = rides.some(function (savedRide) {
+    return (
+      getDeclinedRideHistoryId(savedRide) === rideId
+    );
+  });
+
+  if (alreadySaved) {
+    return false;
+  }
+
+  const savedRide =
+    JSON.parse(JSON.stringify(ride));
+
+  savedRide.declinedAt =
+    savedRide.updatedAt || Date.now();
+
+  rides.push(savedRide);
+
+  saveStoredObject(
+    DRIVER_DECLINED_RIDES_KEY,
+    rides
+  );
+
+  return true;
+}
+
+// =====================================
+// 3R DECLINED HISTORY — STORAGE END
+// =====================================
+
+// =====================================
+// 3R DECLINED HISTORY — DETAILS START
+// Additive declined-request details only.
+// =====================================
+function formatDeclinedRideDate(ride) {
+  const value =
+    ride.declinedAt ||
+    ride.updatedAt ||
+    ride.createdAt;
+
+  if (!value) {
+    return "Date unavailable";
+  }
+
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime())
+    ? "Date unavailable"
+    : date.toLocaleString();
+}
+
+function findDeclinedRide(historyId) {
+  return getDeclinedDriverRides().find(
+    function (ride) {
+      return (
+        getDeclinedRideHistoryId(ride) ===
+        String(historyId)
+      );
+    }
+  );
+}
+
+function getDeclinedRideDetailItems(ride) {
+  const rideType =
+    ride.selectedRide ||
+    ride.rideType ||
+    "Rudolf Ride";
+
+  const rideId =
+    ride.rideId ||
+    ride.createdAt ||
+    "Unavailable";
+
+  return [
+    ["Pickup", ride.pickup || "Unavailable"],
+    ["Destination", ride.destination || "Unavailable"],
+    ["Ride Type", rideType],
+    ["Ride ID", rideId],
+    ["Date", formatDeclinedRideDate(ride)],
+    ["Fare offered", formatFare(ride.fare)],
+    ["Status", "Ride declined"]
+  ];
+}
+
+function openDeclinedRideDetails(historyId) {
+  const ride =
+    findDeclinedRide(historyId);
+
+  if (!ride) {
+    console.error(
+      "Declined ride details not found:",
+      historyId
+    );
+    return;
+  }
+
+  const ridesSection =
+    document.getElementById(
+      "driver-rides-section"
+    );
+
+  const detailsSection =
+    document.getElementById(
+      "driver-ride-details-section"
+    );
+
+  const content =
+    document.getElementById(
+      "ride-details-content"
+    );
+
+  if (!detailsSection || !content) {
+    return;
+  }
+
+  content.innerHTML = "";
+
+  const items =
+    getDeclinedRideDetailItems(ride);
+
+  items.forEach(function (item) {
+    const row =
+      document.createElement("div");
+
+    row.className =
+      "ride-details-row";
+
+    const label =
+      document.createElement("span");
+
+    const value =
+      document.createElement("strong");
+
+    label.textContent =
+      item[0];
+
+    value.textContent =
+      item[1];
+
+    row.appendChild(label);
+    row.appendChild(value);
+    content.appendChild(row);
+  });
+
+  if (ridesSection) {
+    ridesSection.style.display = "none";
+  }
+
+  detailsSection.style.display = "block";
+  window.scrollTo(0, 0);
+}
+
+// =====================================
+// 3R DECLINED HISTORY — DETAILS END
+// =====================================
+
+// =====================================
+// 3R DECLINED HISTORY — CARDS START
+// Additive declined-request cards only.
+// =====================================
+function createDeclinedRideCard(ride) {
+  const card =
+    document.createElement("article");
+
+  card.className =
+    "ride-history-card ride-card";
+
+  const title =
+    document.createElement("h3");
+
+  title.textContent =
+    (ride.pickup || "Pickup") +
+    " → " +
+    (ride.destination || "Destination");
+
+  card.appendChild(title);
+
+  addRideDetail(
+    card,
+    "Ride",
+    ride.selectedRide ||
+    ride.rideType ||
+    "Rudolf Ride"
+  );
+
+  addRideDetail(
+    card,
+    "Fare offered",
+    formatFare(ride.fare)
+  );
+
+  addRideDetail(
+    card,
+    "Status",
+    "Ride declined"
+  );
+
+  addRideDetail(
+    card,
+    "Date",
+    formatDeclinedRideDate(ride)
+  );
+
+  const button =
+    document.createElement("button");
+
+  button.type = "button";
+  button.className =
+    "ride-view-details-btn";
+  button.textContent =
+    "View Details";
+
+  const historyId =
+    getDeclinedRideHistoryId(ride);
+
+  button.addEventListener(
+    "click",
+    function () {
+      openDeclinedRideDetails(historyId);
+    }
+  );
+
+  card.appendChild(button);
+  return card;
+}
+
+function renderDeclinedRideHistory() {
+  const list =
+    document.getElementById("driver-rides-list");
+
+  if (!list) return;
+
+  const oldSection =
+    document.getElementById(
+      "driver-declined-rides-history"
+    );
+
+  if (oldSection) {
+    oldSection.remove();
+  }
+
+  const declinedRides =
+    getDeclinedDriverRides()
+      .slice()
+      .reverse();
+
+  if (declinedRides.length === 0) {
+    return;
+  }
+
+  const emptyBox =
+    list.querySelector("#rides-list");
+
+  if (emptyBox) {
+    emptyBox.remove();
+  }
+
+  const section =
+    document.createElement("section");
+
+  section.id =
+    "driver-declined-rides-history";
+
+  const heading =
+    document.createElement("h3");
+
+  heading.textContent =
+    "Declined requests";
+
+  section.appendChild(heading);
+
+  declinedRides.forEach(function (ride) {
+    section.appendChild(
+      createDeclinedRideCard(ride)
+    );
+  });
+
+  list.appendChild(section);
+}
+
+// =====================================
+// 3R DECLINED HISTORY — CARDS END
+// =====================================
+
+// =====================================
+// 3R DECLINED HISTORY — CONNECTION START
+// Original My Rides renderer remains unchanged.
+// =====================================
+const originalRenderDriverRides3R =
+  renderDriverRides;
+
+renderDriverRides = function () {
+  originalRenderDriverRides3R();
+
+  try {
+    renderDeclinedRideHistory();
+  } catch (error) {
+    console.error(
+      "Declined history render failed:",
+      error
+    );
+  }
+};
+
+// =====================================
+// 3R DECLINED HISTORY — CONNECTION END
+// =====================================
