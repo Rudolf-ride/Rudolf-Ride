@@ -3311,7 +3311,8 @@ body {
 /* ===== 3R 2-ERROR PRESENTATION PATCH END ===== */
 
 /* ===== 3R DECLINED HISTORY STATUS COLOR START ===== */
-#driver-declined-rides-history .declined-status-line {
+#driver-declined-rides-history .declined-status-line,
+#driver-declined-rides-history .declined-status-line strong {
   color: #dc2626 !important;
   font-weight: 800 !important;
 }
