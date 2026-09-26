@@ -923,8 +923,24 @@ function completeTrip() {
 
   // Save ride first.
   // Earnings are credited only if this is a NEW ride.
+  // 3R TEMP DIAGNOSTIC — completed-history flight recorder
+  console.log(
+    "3R COMPLETE BEFORE SAVE:",
+    JSON.stringify(ride),
+    "HISTORY:",
+    localStorage.getItem(DRIVER_RIDES_KEY)
+  );
+
   const isNewCompletedRide =
     saveCompletedRide(ride);
+
+  console.log(
+    "3R COMPLETE AFTER SAVE:",
+    "NEW:",
+    isNewCompletedRide,
+    "HISTORY:",
+    localStorage.getItem(DRIVER_RIDES_KEY)
+  );
 
   if (isNewCompletedRide) {
     let todayEarnings =
