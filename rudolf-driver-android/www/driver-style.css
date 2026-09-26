@@ -3309,3 +3309,10 @@ body {
 @media(max-width:380px){#driver-rides-section{padding-left:10px!important;padding-right:10px!important;}#driver-wallet-section .wallet-transaction{grid-template-columns:1fr!important;gap:8px!important;padding:10px!important;}#driver-wallet-section .wallet-transaction>div:last-child{align-items:flex-start!important;text-align:left!important;}}
 
 /* ===== 3R 2-ERROR PRESENTATION PATCH END ===== */
+
+/* ===== 3R DECLINED HISTORY STATUS COLOR START ===== */
+#driver-declined-rides-history .declined-status-line {
+  color: #dc2626 !important;
+  font-weight: 800 !important;
+}
+/* ===== 3R DECLINED HISTORY STATUS COLOR END ===== */
