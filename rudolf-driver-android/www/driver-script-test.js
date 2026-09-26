@@ -1037,8 +1037,8 @@ function getDriverRides() {
 function saveCompletedRide(ride) {
   const rides = getDriverRides();
 
-  const alreadySaved =
-    rides.some(function (savedRide) {
+  const existingIndex =
+    rides.findIndex(function (savedRide) {
       if (
         savedRide.rideId &&
         ride.rideId
@@ -1057,18 +1057,25 @@ function saveCompletedRide(ride) {
       );
     });
 
-  if (!alreadySaved) {
-    rides.push(ride);
+  if (existingIndex !== -1) {
+    rides[existingIndex] = ride;
 
     saveStoredObject(
       DRIVER_RIDES_KEY,
       rides
     );
 
-    return true;
+    return false;
   }
 
-  return false;
+  rides.push(ride);
+
+  saveStoredObject(
+    DRIVER_RIDES_KEY,
+    rides
+  );
+
+  return true;
 }
 
 function isDateToday(value) {
