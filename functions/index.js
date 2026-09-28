@@ -42,7 +42,7 @@ exports.sendNewRideNotification = onValueCreated(
       "Rudolf Ride";
 
     const subscriptionId =
-      "d32577ba-de64-49e8-b9bd-8181e7218502";
+      "db6c81f6-a53d-4567-8d9e-db37a4a21393";
 
     const response = await fetch(
       "https://paystack-backend-gamma.vercel.app/send-driver-notification",
