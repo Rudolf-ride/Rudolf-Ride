@@ -1391,6 +1391,9 @@
     button.disabled = true;
     button.textContent = "Preparing notifications...";
     await OneSignal.initialize(ONESIGNAL_APP_ID);
+
+    // RUDOLF_3R_PHONE2_PUSH_SUBSCRIPTION_RECOVERY
+    await OneSignal.User.pushSubscription.optIn();
     window.rudolfMobilePush = OneSignal;
     button.disabled = false;
     button.textContent = "🔔";
