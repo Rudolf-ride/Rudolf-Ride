@@ -22,7 +22,7 @@ public class RideNotificationServiceExtension
         implements INotificationServiceExtension {
 
     private static final String CHANNEL_ID =
-            "rudolf_ride_requests_v2";
+            "rudolf_ride_requests_overlay_v3";
 
     @Override
     public void onNotificationReceived(
@@ -55,7 +55,7 @@ public class RideNotificationServiceExtension
                         new NotificationChannel(
                                 CHANNEL_ID,
                                 "Incoming ride requests",
-                                NotificationManager.IMPORTANCE_HIGH
+                                NotificationManager.IMPORTANCE_LOW
                         );
 
                 channel.setDescription(
@@ -99,6 +99,13 @@ public class RideNotificationServiceExtension
                         "GH₵ --"
                 )
                 : "GH₵ --";
+
+        String rideType = data != null
+                ? data.optString(
+                        "rideType",
+                        "Rudolf Ride"
+                )
+                : "Rudolf Ride";
 
         Intent fullScreenIntent =
                 new Intent(
@@ -146,7 +153,12 @@ public class RideNotificationServiceExtension
 
         // RUDOLF_AUTOMATIC_HALF_SCREEN
         RideRequestOverlay.show(
-                context, notificationId, pickup, destination, fare,
+                context,
+                notificationId,
+                pickup,
+                destination,
+                fare,
+                rideType,
                 data != null ? data.optString("rideId", "") : ""
         );
 
@@ -156,7 +168,7 @@ public class RideNotificationServiceExtension
                     .setContentTitle("Rudolf Ride — New ride request")
                     .setChannelId(CHANNEL_ID)
                     .setPriority(
-                            NotificationCompat.PRIORITY_MAX
+                            NotificationCompat.PRIORITY_LOW
                     )
                     .setVisibility(
                             NotificationCompat.VISIBILITY_PUBLIC
