@@ -8,6 +8,7 @@ async function getPushDiagnostics() {
 
   let oneSignalId = null;
   let subscriptionId = null;
+  let pushToken = null;
   let optedIn = null;
 
   try {
@@ -23,6 +24,12 @@ async function getPushDiagnostics() {
   }
 
   try {
+    pushToken = await OneSignal.User.pushSubscription.getTokenAsync();
+  } catch (error) {
+    console.warn("Push token check failed:", error);
+  }
+
+  try {
     optedIn = await OneSignal.User.pushSubscription.getOptedInAsync();
   } catch (error) {
     console.warn("Opt-in check failed:", error);
@@ -32,6 +39,7 @@ async function getPushDiagnostics() {
     permission,
     oneSignalId,
     subscriptionId,
+    pushToken,
     optedIn
   };
 }
@@ -53,6 +61,9 @@ async function startMobilePush() {
   button.textContent = "Preparing notifications...";
 
   await OneSignal.initialize(ONESIGNAL_APP_ID);
+
+  // RUDOLF_3R_SPR_PUSH_REGISTRATION
+  await OneSignal.User.pushSubscription.optIn();
 
   window.rudolfMobilePush = OneSignal;
 
