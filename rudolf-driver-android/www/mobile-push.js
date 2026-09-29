@@ -1355,6 +1355,7 @@
     const permission = await OneSignal.Notifications.hasPermission();
     let oneSignalId = null;
     let subscriptionId = null;
+      let pushToken = null;
     let optedIn = null;
     try {
       oneSignalId = await OneSignal.User.getOnesignalId();
@@ -1366,6 +1367,11 @@
     } catch (error) {
       console.warn("Subscription ID check failed:", error);
     }
+      try {
+        pushToken = await OneSignal.User.pushSubscription.getTokenAsync();
+      } catch (error) {
+        console.warn(\"Push token check failed:\", error);
+      }
     try {
       optedIn = await OneSignal.User.pushSubscription.getOptedInAsync();
     } catch (error) {
@@ -1375,6 +1381,7 @@
       permission,
       oneSignalId,
       subscriptionId,
+        pushToken,
       optedIn
     };
   }
