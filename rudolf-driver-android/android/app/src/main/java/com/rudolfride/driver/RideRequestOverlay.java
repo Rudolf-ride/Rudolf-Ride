@@ -30,7 +30,7 @@ public final class RideRequestOverlay {
 
     public static void show(
             Context context, String id, String pickup,
-            String destination, String fare, String rideType, String rideId) {
+            String destination, String fare, String rideId) {
         Context app = context.getApplicationContext();
         MAIN.post(() -> {
             try {
@@ -42,7 +42,7 @@ public final class RideRequestOverlay {
                     return;
                 }
                 hide();
-                display(app, pickup, destination, fare, rideType, rideId);
+                display(app, pickup, destination, fare, rideId);
                 lastId = id;
             } catch (RuntimeException error) {
                 Log.e(TAG, "Could not display ride overlay", error);
@@ -63,8 +63,8 @@ public final class RideRequestOverlay {
         view.setText(value);
         view.setTextSize(size);
         view.setTextColor(Color.rgb(17, 24, 39));
-        view.setPadding(dp(context, 16), dp(context, 6),
-                dp(context, 16), dp(context, 6));
+        view.setPadding(dp(context, 16), dp(context, 8),
+                dp(context, 16), dp(context, 8));
         if (bold) {
             view.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         }
@@ -77,7 +77,7 @@ public final class RideRequestOverlay {
     }
 
     private static void display(
-            Context app, String pickup, String destination, String fare, String rideType, String rideId) {
+            Context app, String pickup, String destination, String fare, String rideId) {
         Context context = new ContextThemeWrapper(
                 app, android.R.style.Theme_Material_Light_NoActionBar
         );
@@ -91,7 +91,7 @@ public final class RideRequestOverlay {
         root.setBackgroundColor(Color.WHITE);
         root.setElevation(dp(context, 12));
 
-        TextView title = text(context, "Rudolf Ride — NEW REQUEST", 24, true);
+        TextView title = text(context, "Rudolf Ride — NEW REQUEST", 20, true);
         title.setTextColor(Color.WHITE);
         title.setBackgroundColor(Color.rgb(0, 150, 80));
         root.addView(title);
@@ -100,56 +100,19 @@ public final class RideRequestOverlay {
         LinearLayout details = new LinearLayout(context);
         details.setOrientation(LinearLayout.VERTICAL);
 
-        details.addView(text(context, "PICKUP", 16, true));
-        details.addView(text(context, value(pickup, "Pickup location"), 22, false));
-
-        // 3R DYNAMIC RIDE TYPE — NEW VIEW ONLY
-        String rideKey = value(rideType, "").toLowerCase(java.util.Locale.ROOT);
-
-        String selectedRideType =
-                rideKey.contains("comfort") ? "Comfort" :
-                rideKey.contains("xl") ? "XL" :
-                rideKey.contains("economy") ? "Economy" :
-                value(rideType, "Rudolf Ride");
-
-        String rideCard = "🚗 Rudolf Ride\n" + selectedRideType;
-
-        View rideTopSpacer = new View(context);
-        details.addView(rideTopSpacer, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0,
-                1f
-        ));
-
-        TextView rideTypeView = text(context, rideCard, 24, true);
-        rideTypeView.setGravity(android.view.Gravity.CENTER);
-        rideTypeView.setPadding(dp(context, 16), dp(context, 18),
-                dp(context, 16), dp(context, 10));
-
-        details.addView(rideTypeView);
-
-        View rideBottomSpacer = new View(context);
-        details.addView(rideBottomSpacer, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0,
-                1f
-        ));
-
-        details.addView(text(context, "DESTINATION", 16, true));
-        details.addView(text(context, value(destination, "Destination"), 26, false));
+        details.addView(text(context, "PICKUP", 12, true));
+        details.addView(text(context, value(pickup, "Pickup location"), 19, false));
+        details.addView(text(context, "DESTINATION", 12, true));
+        details.addView(text(context, value(destination, "Destination"), 19, false));
 
         String amount = value(fare, "GH₵ --");
         if (amount.matches("[0-9]+([.][0-9]+)?")) {
             amount = "GH₵ " + amount;
         }
-        details.addView(text(context, "FARE: " + amount, 27, true));
+        details.addView(text(context, "FARE: " + amount, 23, true));
         scroll.addView(details);
-        scroll.setFillViewport(true);
-
         root.addView(scroll, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0,
-                1f
+                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
         ));
 
         // RUDOLF_OVERLAY_ACTION_BUTTONS
@@ -183,11 +146,10 @@ public final class RideRequestOverlay {
 
         root.addView(actions);
         root.addView(text(context,
-                "Tap Accept or Decline to continue in the driver app.", 14, false));
+                "Tap Accept or Decline to continue in the driver app.", 12, false));
 
         Button close = new Button(context);
         close.setText("CLOSE");
-        close.setTextSize(18);
         close.setOnClickListener(view -> hide());
         root.addView(close, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(context, 52)
@@ -208,12 +170,12 @@ public final class RideRequestOverlay {
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT,
+                screenHeight / 2,
                 type,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT
         );
-        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        params.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
         params.setTitle("Rudolf Ride request");
 
         panel = root;
