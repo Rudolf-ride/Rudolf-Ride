@@ -100,13 +100,6 @@ public class RideNotificationServiceExtension
                 )
                 : "GH₵ --";
 
-        String rideType = data != null
-                ? data.optString(
-                        "rideType",
-                        "Rudolf Ride"
-                )
-                : "Rudolf Ride";
-
         Intent fullScreenIntent =
                 new Intent(
                         context,
@@ -153,7 +146,7 @@ public class RideNotificationServiceExtension
 
         // RUDOLF_AUTOMATIC_HALF_SCREEN
         RideRequestOverlay.show(
-                context, notificationId, pickup, destination, fare, rideType,
+                context, notificationId, pickup, destination, fare,
                 data != null ? data.optString("rideId", "") : ""
         );
 
