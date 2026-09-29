@@ -30,7 +30,8 @@ public final class RideRequestOverlay {
 
     public static void show(
             Context context, String id, String pickup,
-            String destination, String fare, String rideId) {
+            String destination, String fare,
+            String rideType, String rideId) {
         Context app = context.getApplicationContext();
         MAIN.post(() -> {
             try {
@@ -42,7 +43,14 @@ public final class RideRequestOverlay {
                     return;
                 }
                 hide();
-                display(app, pickup, destination, fare, rideId);
+                display(
+                        app,
+                        pickup,
+                        destination,
+                        fare,
+                        rideType,
+                        rideId
+                );
                 lastId = id;
             } catch (RuntimeException error) {
                 Log.e(TAG, "Could not display ride overlay", error);
@@ -77,7 +85,12 @@ public final class RideRequestOverlay {
     }
 
     private static void display(
-            Context app, String pickup, String destination, String fare, String rideId) {
+            Context app,
+            String pickup,
+            String destination,
+            String fare,
+            String rideType,
+            String rideId) {
         Context context = new ContextThemeWrapper(
                 app, android.R.style.Theme_Material_Light_NoActionBar
         );
@@ -102,6 +115,26 @@ public final class RideRequestOverlay {
 
         details.addView(text(context, "PICKUP", 12, true));
         details.addView(text(context, value(pickup, "Pickup location"), 19, false));
+
+        String rawRideType = value(rideType, "Rudolf Ride");
+        String normalizedRideType = rawRideType.toLowerCase();
+        String rideTypeLabel;
+
+        if (normalizedRideType.contains("comfort")) {
+            rideTypeLabel = "Comfort";
+        } else if (normalizedRideType.contains("xl")) {
+            rideTypeLabel = "XL";
+        } else if (normalizedRideType.contains("economy")) {
+            rideTypeLabel = "Economy";
+        } else {
+            rideTypeLabel = "Rudolf Ride";
+        }
+
+        TextView rideTypeView =
+                text(context, rideTypeLabel, 20, true);
+        rideTypeView.setGravity(Gravity.CENTER);
+        details.addView(rideTypeView);
+
         details.addView(text(context, "DESTINATION", 12, true));
         details.addView(text(context, value(destination, "Destination"), 19, false));
 
@@ -170,7 +203,7 @@ public final class RideRequestOverlay {
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
-                screenHeight / 2,
+                WindowManager.LayoutParams.MATCH_PARENT,
                 type,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT
