@@ -1403,7 +1403,7 @@
         await OneSignal.Notifications.requestPermission(true);
         const result = await getPushDiagnostics();
         console.log("RUDOLF NATIVE PUSH DIAGNOSTIC:", result);
-        button.textContent = result.permission && result.subscriptionId ? "\u2705 Mobile Alerts Ready" : "\u26A0\uFE0F Check Notifications";
+        button.textContent = result.permission && result.optedIn && result.subscriptionId && result.pushToken ? "\u2705 Mobile Alerts Ready" : "\u26A0\uFE0F Check Notifications";
         alert(
           "RUDOLF RIDE NATIVE PUSH\n\nPermission: " + result.permission + "\nOpted In: " + result.optedIn + "\nOneSignal ID: " + (result.oneSignalId || "NOT READY") + "\nSubscription ID: " + (result.subscriptionId || "NOT READY")
         );
