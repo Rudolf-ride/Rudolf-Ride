@@ -586,6 +586,17 @@ function startCloudRideListener() {
           stopRideRingtone();
           stopDriverLiveLocation();
 
+          // 3R-DPS-B — preserve passenger cancellation
+          try {
+            savePassengerCancelledRideHistory(ride);
+            renderDriverRides();
+          } catch (error) {
+            console.error(
+              "Passenger cancellation history save failed:",
+              error
+            );
+          }
+
           saveStoredObject(
             CURRENT_RIDE_KEY,
             ride
@@ -3334,4 +3345,277 @@ renderDriverRides = function () {
 
 // =====================================
 // 3R DECLINED HISTORY — CONNECTION END
+// =====================================
+
+// =====================================
+// 3R PASSENGER CANCELLATION HISTORY — STORAGE START
+// Phone 2 Driver only.
+// =====================================
+
+const DRIVER_PASSENGER_CANCELLED_RIDES_KEY =
+  "rudolfDriverPassengerCancelledRides";
+
+function getPassengerCancelledDriverRides() {
+  const rides = readStoredObject(
+    DRIVER_PASSENGER_CANCELLED_RIDES_KEY,
+    []
+  );
+
+  return Array.isArray(rides) ? rides : [];
+}
+
+function getPassengerCancelledRideHistoryId(ride) {
+  if (!ride) return "";
+
+  return String(
+    ride.rideId ||
+    ride.createdAt ||
+    [
+      ride.pickup || "",
+      ride.destination || "",
+      ride.fare || ""
+    ].join("|")
+  );
+}
+
+function savePassengerCancelledRideHistory(ride) {
+  if (
+    !ride ||
+    (
+      ride.status !== "Ride canceled" &&
+      ride.status !== "Ride cancelled"
+    )
+  ) {
+    return false;
+  }
+
+  const rides =
+    getPassengerCancelledDriverRides();
+
+  const historyId =
+    getPassengerCancelledRideHistoryId(ride);
+
+  const alreadySaved =
+    rides.some(function (savedRide) {
+      return (
+        getPassengerCancelledRideHistoryId(savedRide) ===
+        historyId
+      );
+    });
+
+  if (alreadySaved) {
+    return false;
+  }
+
+  const savedRide =
+    JSON.parse(JSON.stringify(ride));
+
+  savedRide.passengerCancelledAt =
+    savedRide.updatedAt || Date.now();
+
+  rides.push(savedRide);
+
+  saveStoredObject(
+    DRIVER_PASSENGER_CANCELLED_RIDES_KEY,
+    rides
+  );
+
+  return true;
+}
+
+// =====================================
+// 3R PASSENGER CANCELLATION HISTORY — STORAGE END
+// =====================================
+
+// =====================================
+// 3R PASSENGER CANCELLATION HISTORY — CARDS START
+// Phone 2 Driver only.
+// =====================================
+
+function formatPassengerCancelledRideDate(ride) {
+  const value =
+    ride.passengerCancelledAt ||
+    ride.updatedAt ||
+    ride.createdAt;
+
+  if (!value) {
+    return "Date unavailable";
+  }
+
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime())
+    ? "Date unavailable"
+    : date.toLocaleString();
+}
+
+function createPassengerCancelledRideCard(ride) {
+  const card =
+    document.createElement("article");
+
+  card.className =
+    "ride-history-card ride-card";
+
+  // Red identification for Passenger cancellation.
+  card.style.borderLeft =
+    "4px solid #c62828";
+
+  const title =
+    document.createElement("h3");
+
+  title.textContent =
+    (ride.pickup || "Pickup") +
+    " → " +
+    (ride.destination || "Destination");
+
+  card.appendChild(title);
+
+  addRideDetail(
+    card,
+    "Ride",
+    ride.selectedRide ||
+    ride.rideType ||
+    "Rudolf Ride"
+  );
+
+  addRideDetail(
+    card,
+    "Fare offered",
+    formatFare(ride.fare)
+  );
+
+  addRideDetail(
+    card,
+    "Status",
+    "Passenger canceled"
+  );
+
+  if (card.lastElementChild) {
+    card.lastElementChild.classList.add(
+      "declined-status-line"
+    );
+  }
+
+  addRideDetail(
+    card,
+    "Cancellation reason",
+    ride.cancellationReason ||
+    ride.cancelReason ||
+    "No reason provided"
+  );
+
+  addRideDetail(
+    card,
+    "Date",
+    formatPassengerCancelledRideDate(ride)
+  );
+
+  return card;
+}
+
+function renderPassengerCancelledRideHistory() {
+  const list =
+    document.getElementById(
+      "driver-rides-list"
+    );
+
+  if (!list) return;
+
+  const oldSection =
+    document.getElementById(
+      "driver-passenger-cancelled-rides-history"
+    );
+
+  if (oldSection) {
+    oldSection.remove();
+  }
+
+  const cancelledRides =
+    getPassengerCancelledDriverRides()
+      .slice()
+      .reverse();
+
+  if (cancelledRides.length === 0) {
+    return;
+  }
+
+  // Remove "No ride yet" when a Passenger
+  // cancellation history exists.
+  const emptyBox =
+    list.querySelector("#rides-list");
+
+  if (emptyBox) {
+    emptyBox.remove();
+  }
+
+  const section =
+    document.createElement("section");
+
+  section.id =
+    "driver-passenger-cancelled-rides-history";
+
+  const heading =
+    document.createElement("h3");
+
+  heading.textContent =
+    "Passenger cancellations";
+
+  section.appendChild(heading);
+
+  cancelledRides.forEach(function (ride) {
+    section.appendChild(
+      createPassengerCancelledRideCard(ride)
+    );
+  });
+
+  // Keep existing order:
+  // Completed rides
+  // Passenger cancellations
+  // Driver declined requests
+  const declinedSection =
+    document.getElementById(
+      "driver-declined-rides-history"
+    );
+
+  if (
+    declinedSection &&
+    declinedSection.parentNode === list
+  ) {
+    list.insertBefore(
+      section,
+      declinedSection
+    );
+  } else {
+    list.appendChild(section);
+  }
+}
+
+// =====================================
+// 3R PASSENGER CANCELLATION HISTORY — CARDS END
+// =====================================
+
+
+// =====================================
+// 3R PASSENGER CANCELLATION HISTORY — CONNECTION START
+// Preserve all existing My Rides behaviour.
+// =====================================
+
+const renderDriverRidesBeforePassengerCancel3R =
+  renderDriverRides;
+
+renderDriverRides = function () {
+  renderDriverRidesBeforePassengerCancel3R();
+
+  try {
+    renderPassengerCancelledRideHistory();
+  } catch (error) {
+    console.error(
+      "Passenger cancellation history render failed:",
+      error
+    );
+  }
+};
+
+// =====================================
+// 3R PASSENGER CANCELLATION HISTORY — CONNECTION END
 // =====================================
