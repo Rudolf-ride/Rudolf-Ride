@@ -3317,3 +3317,166 @@ body {
   font-weight: 800 !important;
 }
 /* ===== 3R DECLINED HISTORY STATUS COLOR END ===== */
+
+/* =====================================================
+   RUDOLF RIDE — PHONE 2 DRIVER MESSAGES
+   3R-DPS-B ISOLATED STYLES
+   ===================================================== */
+
+
+.driver-messages-section {
+  box-sizing: border-box;
+  min-height: calc(100vh - 70px);
+  padding: 18px 16px 100px;
+  background: #f7f8f8;
+}
+
+.rr-messages-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.rr-messages-header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.rr-messages-header p {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: #66706a;
+}
+
+.rr-messages-back {
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 13px;
+  background: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 8px #00000012;
+}
+
+.rr-message-list {
+  height: calc(100vh - 255px);
+  min-height: 280px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 14px 10px;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px #00000010;
+}
+
+.rr-message-empty {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #69736d;
+}
+
+.rr-message-empty > div {
+  font-size: 38px;
+  margin-bottom: 8px;
+}
+
+.rr-message-empty strong {
+  color: #17251e;
+}
+
+.rr-message-empty p {
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
+.rr-message-row {
+  display: flex;
+  margin: 8px 0;
+}
+
+.rr-message-driver {
+  justify-content: flex-end;
+}
+
+.rr-message-other {
+  justify-content: flex-start;
+}
+
+.rr-message-bubble {
+  max-width: 82%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: #edf1ee;
+}
+
+.rr-message-driver .rr-message-bubble {
+  background: #dff5e7;
+}
+
+.rr-message-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+  font-size: 15px;
+  color: #17251e;
+}
+
+.rr-message-meta {
+  display: block;
+  margin-top: 5px;
+  font-size: 10px;
+  color: #6d776f;
+}
+
+.rr-message-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.rr-message-form textarea {
+  width: 100%;
+  min-height: 48px;
+  max-height: 120px;
+  resize: none;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #d9e2dc;
+  border-radius: 14px;
+  background: #ffffff;
+  font: inherit;
+  outline: none;
+}
+
+.rr-message-form textarea:focus {
+  border-color: #16854b;
+}
+
+.rr-message-form button {
+  min-width: 72px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 16px;
+  background: #16854b;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.rr-message-form button:disabled {
+  opacity: 0.6;
+}
+
+.rr-message-status {
+  min-height: 18px;
+  margin: 6px 4px 0;
+  font-size: 12px;
+  color: #59665e;
+}
+

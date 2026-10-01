@@ -1613,6 +1613,11 @@ function showDriverSection(section) {
       "driver-wallet-section"
     );
 
+  const messagesSection =
+    document.getElementById(
+      "driver-messages-section"
+    );
+
   const withdrawSection =
     document.getElementById(
       "driver-withdraw-section"
@@ -1653,6 +1658,13 @@ function showDriverSection(section) {
   if (walletSection) {
     walletSection.style.display =
       section === "wallet"
+        ? "block"
+        : "none";
+  }
+
+  if (messagesSection) {
+    messagesSection.style.display =
+      section === "messages"
         ? "block"
         : "none";
   }

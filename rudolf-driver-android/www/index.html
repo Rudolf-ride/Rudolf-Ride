@@ -69,6 +69,14 @@
         style="display:none;"
       >
         <button
+          id="driver-messages-menu-btn"
+          type="button"
+          onclick="showDriverSection('messages'); document.getElementById('driver-menu-dropdown').style.display='none';"
+        >
+          💬 Messages
+        </button>
+
+        <button
           id="driver-logout-btn"
           type="button"
         >
@@ -617,6 +625,71 @@
   </button>
 </section>
 
+
+<!-- =========================================
+     RUDOLF RIDE — DRIVER IN-BUILT MESSAGES
+     PHONE 2 ONLY
+     ========================================= -->
+<section
+  id="driver-messages-section"
+  class="driver-section driver-messages-section"
+  style="display: none;"
+>
+  <div class="rr-messages-header">
+
+    <button
+      type="button"
+      class="rr-messages-back"
+      onclick="showDriverSection('home')"
+    >
+      ← Back
+    </button>
+
+    <div>
+      <h2>💬 Messages</h2>
+      <p>Rudolf Ride in-app messages</p>
+    </div>
+
+  </div>
+
+  <div
+    id="driver-message-list"
+    class="rr-message-list"
+    aria-live="polite"
+  >
+    <div class="rr-message-empty">
+      <div>💬</div>
+      <strong>No messages yet</strong>
+      <p>Your Rudolf Ride messages will appear here.</p>
+    </div>
+  </div>
+
+  <form
+    id="driver-message-form"
+    class="rr-message-form"
+  >
+    <textarea
+      id="driver-message-input"
+      rows="2"
+      maxlength="500"
+      placeholder="Type a message..."
+      aria-label="Type a message"
+    ></textarea>
+
+    <button
+      id="driver-message-send-btn"
+      type="submit"
+    >
+      Send
+    </button>
+  </form>
+
+  <p
+    id="driver-message-status"
+    class="rr-message-status"
+  ></p>
+</section>
+
 <div id="rr-ride-action-dock" class="request-buttons" aria-live="polite"></div>
 <nav class="driver-bottom-nav">
   <button
@@ -681,6 +754,7 @@
 
   <!-- 3R: old in-app ride popup disabled; native popup is active -->
 
+<script src="driver-messages.js"></script>
 <script src="mobile-push.js" defer></script>
 <script src="ride-overlay-actions.js"></script>
 </body>
