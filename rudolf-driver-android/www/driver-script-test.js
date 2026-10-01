@@ -588,8 +588,15 @@ function startCloudRideListener() {
 
           // 3R-DPS-B — preserve passenger cancellation
           try {
-            savePassengerCancelledRideHistory(ride);
+            const isNewPassengerCancellation =
+              savePassengerCancelledRideHistory(ride);
+
             renderDriverRides();
+
+            // Show once only for a newly saved passenger cancellation.
+            if (isNewPassengerCancellation) {
+              showPassengerCancellationPopup(ride);
+            }
           } catch (error) {
             console.error(
               "Passenger cancellation history save failed:",
@@ -3349,6 +3356,222 @@ renderDriverRides = function () {
 
 // =====================================
 // 3R DECLINED HISTORY — CONNECTION END
+// =====================================
+
+// =====================================
+// 3R-DPS-B PASSENGER CANCELLATION POPUP START
+// Phone 2 Driver only.
+// =====================================
+
+function showPassengerCancellationPopup(ride) {
+  if (!ride) return;
+
+  const popupId =
+    "rudolf-passenger-cancellation-popup";
+
+  // DOM protection against duplicate visible popups.
+  if (document.getElementById(popupId)) {
+    return;
+  }
+
+  const previousFocus = document.activeElement;
+
+  const overlay =
+    document.createElement("div");
+
+  overlay.id = popupId;
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute(
+    "aria-labelledby",
+    popupId + "-title"
+  );
+
+  overlay.style.cssText =
+    "position:fixed;inset:0;z-index:100001;overflow:auto;" +
+    "display:flex;flex-direction:column;box-sizing:border-box;" +
+    "background:#fff4f2;color:#2d1a18;padding:8px;" +
+    "padding-top:max(8px,env(safe-area-inset-top));" +
+    "padding-bottom:max(8px,env(safe-area-inset-bottom));" +
+    "font:700 15px/1.3 system-ui,sans-serif;" +
+    "overscroll-behavior:contain;";
+
+  const card =
+    document.createElement("div");
+
+  card.style.cssText =
+    "box-sizing:border-box;width:100%;max-width:440px;" +
+    "margin:0 auto;flex:1 0 auto;display:flex;" +
+    "flex-direction:column;padding:14px;background:white;" +
+    "border-radius:16px;box-shadow:0 8px 30px #5b1a141f;" +
+    "overflow-wrap:anywhere;";
+
+  overlay.appendChild(card);
+
+  function textElement(tag, value, css) {
+    const element =
+      document.createElement(tag);
+
+    element.textContent = value;
+    element.style.cssText = css || "";
+    card.appendChild(element);
+
+    return element;
+  }
+
+  function row(label, value) {
+    const line =
+      document.createElement("div");
+
+    line.style.cssText =
+      "display:grid;grid-template-columns:105px minmax(0,1fr);" +
+      "gap:8px;align-items:center;padding:10px 0;" +
+      "border-bottom:1px solid #f1dedb;";
+
+    const title =
+      document.createElement("div");
+
+    title.textContent = label;
+    title.style.cssText =
+      "font-size:14px;font-weight:800;color:#53251f;";
+
+    const detail =
+      document.createElement("div");
+
+    detail.textContent =
+      value === undefined ||
+      value === null ||
+      value === ""
+        ? "Not available"
+        : String(value);
+
+    detail.style.cssText =
+      "min-width:0;font-size:15px;font-weight:700;";
+
+    line.appendChild(title);
+    line.appendChild(detail);
+    card.appendChild(line);
+  }
+
+  function fareText(value) {
+    if (
+      value === undefined ||
+      value === null ||
+      value === ""
+    ) {
+      return "Not available";
+    }
+
+    const cleaned =
+      String(value).replace(/[^\d.-]/g, "");
+
+    const amount = Number(cleaned);
+
+    if (Number.isFinite(amount)) {
+      return "GH₵ " + amount.toFixed(2);
+    }
+
+    return String(value);
+  }
+
+  textElement(
+    "div",
+    "RUDOLF RIDE",
+    "color:#b42318;font-weight:900;letter-spacing:2px;"
+  );
+
+  const heading = textElement(
+    "h2",
+    "Passenger canceled ride",
+    "margin:5px 0 3px;font-size:24px;font-weight:900;color:#b42318;"
+  );
+
+  heading.id = popupId + "-title";
+
+  textElement(
+    "p",
+    "The passenger has canceled this trip.",
+    "margin:0 0 12px;font-size:15px;font-weight:800;color:#53251f;"
+  );
+
+  textElement(
+    "div",
+    "CANCELLATION REASON",
+    "margin-top:4px;font-size:13px;font-weight:900;color:#b42318;"
+  );
+
+  textElement(
+    "div",
+    ride.cancellationReason ||
+      ride.cancelReason ||
+      "No reason provided",
+    "margin:5px 0 12px;padding:14px;border-radius:12px;" +
+      "background:#fff0ed;border:2px solid #e6a49c;" +
+      "font-size:20px;font-weight:900;color:#8a1c13;"
+  );
+
+  row("Pickup", ride.pickup);
+  row("Destination", ride.destination);
+  row("Ride type", ride.rideType);
+  row("Fare offered", fareText(ride.fare));
+  row("Trip ID", ride.rideId);
+
+  textElement(
+    "p",
+    "Cancellation saved in Ride History.",
+    "margin:12px 0 4px;font-size:14px;font-weight:800;color:#53251f;"
+  );
+
+  const done = textElement(
+    "button",
+    "DONE",
+    "display:block;width:100%;min-height:48px;margin-top:auto;" +
+      "border:0;border-radius:12px;background:#b42318;color:white;" +
+      "font:800 16px system-ui;cursor:pointer;padding:11px;"
+  );
+
+  done.type = "button";
+
+  function closePopup() {
+    overlay.remove();
+
+    if (
+      previousFocus &&
+      previousFocus.isConnected
+    ) {
+      previousFocus.focus();
+    }
+  }
+
+  done.addEventListener(
+    "click",
+    closePopup
+  );
+
+  overlay.addEventListener(
+    "keydown",
+    function (event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closePopup();
+      } else if (event.key === "Tab") {
+        event.preventDefault();
+        done.focus();
+      }
+    }
+  );
+
+  document.body.appendChild(overlay);
+
+  try {
+    done.focus({ preventScroll: true });
+  } catch (_) {
+    done.focus();
+  }
+}
+
+// =====================================
+// 3R-DPS-B PASSENGER CANCELLATION POPUP END
 // =====================================
 
 // =====================================
