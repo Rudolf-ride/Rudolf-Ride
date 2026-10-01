@@ -3480,3 +3480,22 @@ body {
   color: #59665e;
 }
 
+
+/* ==================================================
+   3R-DPS-B FLOATING DRIVER MENU
+   Position only — existing design protected
+================================================== */
+.driver-menu-wrap {
+  position: relative !important;
+}
+
+.driver-menu-dropdown {
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  right: 0 !important;
+  z-index: 10000 !important;
+}
+
+.driver-header {
+  overflow: visible !important;
+}
