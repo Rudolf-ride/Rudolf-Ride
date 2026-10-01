@@ -397,8 +397,13 @@ const rideType =
     "request-type"
   );
   if (rideStatus) {
-    rideStatus.textContent =
-      ride.status || "New ride request";
+    const cancellationReason = ride.cancellationReason || ride.cancelReason || "";
+    const passengerCancelled = ride.status === "Ride canceled" || ride.status === "Ride cancelled";
+    if (passengerCancelled && cancellationReason) {
+      rideStatus.textContent = ride.status + " — Reason: " + cancellationReason;
+    } else {
+      rideStatus.textContent = ride.status || "New ride request";
+    }
   }
 if (rideType) {
   rideType.textContent =
