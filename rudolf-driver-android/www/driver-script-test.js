@@ -1620,7 +1620,191 @@ function startDriverLiveLocation() {
 // DRIVER PAGE NAVIGATION
 // =====================================
 
+// =====================================
+// 3R DRS-D — DRIVER VERIFICATION VIEW
+// Profile launcher -> verification details
+// =====================================
+
+let driverVerificationStatusObserver = null;
+
+function syncDriverVerificationProfileStatus() {
+
+  const source =
+    document.getElementById(
+      "driver-verification-status"
+    );
+
+  const mirror =
+    document.getElementById(
+      "driver-verification-profile-status"
+    );
+
+  if (!source || !mirror) {
+    return;
+  }
+
+  mirror.textContent =
+    source.textContent;
+
+  mirror.className =
+    source.className;
+}
+
+
+function initDriverVerificationStatusMirror() {
+
+  const source =
+    document.getElementById(
+      "driver-verification-status"
+    );
+
+  if (!source) {
+    return;
+  }
+
+  syncDriverVerificationProfileStatus();
+
+  if (
+    driverVerificationStatusObserver ||
+    typeof MutationObserver === "undefined"
+  ) {
+    return;
+  }
+
+  driverVerificationStatusObserver =
+    new MutationObserver(
+      syncDriverVerificationProfileStatus
+    );
+
+  driverVerificationStatusObserver.observe(
+    source,
+    {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class"]
+    }
+  );
+}
+
+
+function openDriverVerification() {
+
+  const profileMain =
+    document.getElementById(
+      "driver-profile-main-view"
+    );
+
+  const verificationView =
+    document.getElementById(
+      "driver-verification-view"
+    );
+
+  if (profileMain) {
+    profileMain.style.display = "none";
+  }
+
+  if (verificationView) {
+    verificationView.style.display = "block";
+  }
+
+  initDriverVerificationStatusMirror();
+
+  window.scrollTo(
+    {
+      top: 0,
+      behavior: "smooth"
+    }
+  );
+}
+
+
+function closeDriverVerification() {
+
+  const profileMain =
+    document.getElementById(
+      "driver-profile-main-view"
+    );
+
+  const verificationView =
+    document.getElementById(
+      "driver-verification-view"
+    );
+
+  if (verificationView) {
+    verificationView.style.display = "none";
+  }
+
+  if (profileMain) {
+    profileMain.style.display = "block";
+  }
+
+  syncDriverVerificationProfileStatus();
+
+  window.scrollTo(
+    {
+      top: 0,
+      behavior: "smooth"
+    }
+  );
+}
+
+
+function resetDriverProfileView() {
+
+  const profileMain =
+    document.getElementById(
+      "driver-profile-main-view"
+    );
+
+  const verificationView =
+    document.getElementById(
+      "driver-verification-view"
+    );
+
+  if (profileMain) {
+    profileMain.style.display = "block";
+  }
+
+  if (verificationView) {
+    verificationView.style.display = "none";
+  }
+
+  initDriverVerificationStatusMirror();
+}
+
+
+window.openDriverVerification =
+  openDriverVerification;
+
+window.closeDriverVerification =
+  closeDriverVerification;
+
+
+if (
+  document.readyState === "loading"
+) {
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    initDriverVerificationStatusMirror
+  );
+
+} else {
+
+  initDriverVerificationStatusMirror();
+}
+
+
+// =====================================
+// DRIVER PAGE NAVIGATION
+// =====================================
 function showDriverSection(section) {
+
+  if (section === "profile") {
+    resetDriverProfileView();
+  }
+
   const homeSection =
     document.getElementById(
       "driver-home-section"

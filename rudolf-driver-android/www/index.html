@@ -312,6 +312,9 @@
 <!-- DRIVER PROFILE SECTION -->
 <section id="driver-profile-section" class="driver-section" style="display: none;">
 
+  <!-- 3R DRS-D — PROFILE MAIN VIEW -->
+  <div id="driver-profile-main-view">
+
   <div class="section-title">
     <h2>👤 My Profile</h2>
     <p>Your driver information</p>
@@ -376,6 +379,69 @@
     </button>
 
   </div>
+
+
+  <!-- 3R DRS-D — DRIVER VERIFICATION LAUNCHER -->
+  <div
+    class="driver-verification-card"
+    role="button"
+    tabindex="0"
+    onclick="openDriverVerification()"
+    onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); openDriverVerification(); }"
+    style="cursor:pointer;"
+  >
+
+    <div class="driver-verification-heading">
+
+      <div>
+        <h3>🛡️ Driver Verification</h3>
+        <p>Tap to view or submit your documents</p>
+      </div>
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          gap:10px;
+        "
+      >
+        <span
+          id="driver-verification-profile-status"
+          class="driver-verification-status verification-not-submitted"
+        >
+          Not submitted
+        </span>
+
+        <strong
+          aria-hidden="true"
+          style="font-size:28px;"
+        >
+          ›
+        </strong>
+      </div>
+
+    </div>
+
+  </div>
+
+  </div>
+  <!-- END PROFILE MAIN VIEW -->
+
+
+  <!-- 3R DRS-D — SEPARATE VERIFICATION VIEW -->
+  <div
+    id="driver-verification-view"
+    style="display:none;"
+  >
+
+    <button
+      type="button"
+      class="edit-profile-btn"
+      onclick="closeDriverVerification()"
+      style="margin-bottom:16px;"
+    >
+      ← Back to Profile
+    </button>
 
 
   <!-- =========================================
@@ -498,6 +564,9 @@
     ></p>
 
   </div>
+
+  </div>
+  <!-- END SEPARATE VERIFICATION VIEW -->
 
 </section>
 
