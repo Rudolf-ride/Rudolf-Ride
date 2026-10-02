@@ -61,6 +61,16 @@ onAuthStateChanged(
       "Driver session active:",
       user.email
     );
+
+    const driverEmailEl =
+      document.getElementById(
+        "driver-contact-email"
+      );
+
+    if (driverEmailEl) {
+      driverEmailEl.textContent =
+        user.email || "No email";
+    }
   }
 );
 
