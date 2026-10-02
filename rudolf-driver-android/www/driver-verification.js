@@ -16,6 +16,14 @@
     ["driverPhoto", "verification-driver-photo", "verification-driver-photo-state", "driver-photo", "Driver Photo / Selfie"]
   ];
 
+  const PERSONAL_DOCUMENTS = DOCUMENTS.filter(function (doc) {
+    return ["ghanaCard", "driverLicence", "driverPhoto"].includes(doc[0]);
+  });
+
+  const VEHICLE_DOCUMENTS = DOCUMENTS.filter(function (doc) {
+    return ["vrc", "insurance", "roadworthy"].includes(doc[0]);
+  });
+
   let started = false;
   let currentRecord = null;
 
@@ -24,69 +32,121 @@
     if (el) el.textContent = text || "";
   }
 
-  function statusOf(record) {
-    if (!record || !record.submission || !record.submission.submittedAt) {
-      return "not-submitted";
-    }
+  function statusOf(record, section) {
+    section = section === "vehicle" ? "vehicle" : "personal";
+    const sub = record && record.submission ? record.submission : {};
+    const field = section === "vehicle" ? "vehicleSubmittedAt" : "personalSubmittedAt";
+    const submitted = Date.parse(sub[field] || "") || 0;
+    if (!submitted) return "not-submitted";
 
-    const review = record.review || {};
-    const submitted = Date.parse(record.submission.submittedAt) || 0;
+    const root = record && record.review ? record.review : {};
+    const review = root[section] || {};
     const reviewed = Date.parse(review.reviewedAt || "") || 0;
 
-    if (
-      reviewed >= submitted &&
-      (review.state === "approved" || review.state === "rejected")
-    ) {
+    if (reviewed >= submitted &&
+        (review.state === "approved" || review.state === "rejected")) {
       return review.state;
     }
-
     return "pending";
   }
 
-  function renderStatus(record) {
-    const badge = document.getElementById("driver-verification-status");
-    const button = document.getElementById("driver-verification-submit-btn");
+  function renderSectionStatus(record, section) {
+    section = section === "vehicle" ? "vehicle" : "personal";
+
+    const badge =
+      document.getElementById(
+        section + "-verification-status"
+      );
+
+    const button =
+      document.getElementById(
+        section + "-verification-submit-btn"
+      );
 
     if (!badge) return;
 
-    const status = statusOf(record);
+    const status =
+      statusOf(record, section);
 
-    badge.className = "driver-verification-status";
+    const name =
+      section === "vehicle"
+        ? "Vehicle"
+        : "Personal";
+
+    const icon =
+      section === "vehicle"
+        ? "🚗"
+        : "🪪";
+
+    badge.className =
+      "driver-verification-status";
 
     if (status === "approved") {
       badge.textContent = "Approved";
-      badge.classList.add("verification-approved");
+      badge.classList.add(
+        "verification-approved"
+      );
 
       if (button) {
         button.disabled = true;
-        button.textContent = "✅ Verification Approved";
+        button.textContent =
+          "✅ " + name + " Verification Approved";
       }
+
     } else if (status === "rejected") {
       badge.textContent = "Rejected";
-      badge.classList.add("verification-rejected");
+      badge.classList.add(
+        "verification-rejected"
+      );
 
       if (button) {
         button.disabled = false;
-        button.textContent = "🛡️ Resubmit Verification";
+        button.textContent =
+          icon + " Resubmit " +
+          name + " Verification";
       }
+
     } else if (status === "pending") {
       badge.textContent = "Pending";
-      badge.classList.add("verification-pending");
+      badge.classList.add(
+        "verification-pending"
+      );
 
       if (button) {
         button.disabled = false;
-        button.textContent = "🛡️ Update Submission";
+        button.textContent =
+          icon + " Update " +
+          name + " Verification";
       }
+
     } else {
       badge.textContent = "Not submitted";
-      badge.classList.add("verification-not-submitted");
+      badge.classList.add(
+        "verification-not-submitted"
+      );
 
       if (button) {
         button.disabled = false;
-        button.textContent = "🛡️ Submit for Verification";
+        button.textContent =
+          icon + " Submit " +
+          name + " Verification";
       }
     }
   }
+
+
+  function renderStatus(record) {
+    renderSectionStatus(
+      record,
+      "personal"
+    );
+
+    renderSectionStatus(
+      record,
+      "vehicle"
+    );
+  }
+
 
   function renderDocuments(record) {
     const saved =
@@ -96,13 +156,38 @@
         ? record.submission.documents
         : {};
 
-    const approved =
-      statusOf(record) === "approved";
+    const personalApproved =
+      statusOf(
+        record,
+        "personal"
+      ) === "approved";
+
+    const vehicleApproved =
+      statusOf(
+        record,
+        "vehicle"
+      ) === "approved";
 
     DOCUMENTS.forEach(function (doc) {
       const key = doc[0];
-      const input = document.getElementById(doc[1]);
-      const state = document.getElementById(doc[2]);
+
+      const input =
+        document.getElementById(doc[1]);
+
+      const state =
+        document.getElementById(doc[2]);
+
+      const isPersonal =
+        PERSONAL_DOCUMENTS.some(
+          function (item) {
+            return item[0] === key;
+          }
+        );
+
+      const approved =
+        isPersonal
+          ? personalApproved
+          : vehicleApproved;
 
       if (input) {
         input.disabled = approved;
@@ -114,10 +199,16 @@
 
       state.textContent =
         item && item.url
-          ? "✅ Uploaded" + (item.name ? " — " + item.name : "")
+          ? "✅ Uploaded" +
+            (
+              item.name
+                ? " — " + item.name
+                : ""
+            )
           : "Not uploaded";
     });
   }
+
 
   function render(record) {
     currentRecord = record || null;
@@ -344,12 +435,35 @@
   }
 
 
-  async function submitDriverVerification() {
+  async function submitDriverVerification(section) {
+    section =
+      section === "vehicle"
+        ? "vehicle"
+        : "personal";
+
+    const sectionName =
+      section === "vehicle"
+        ? "Vehicle"
+        : "Personal";
+
+    const sectionDocuments =
+      section === "vehicle"
+        ? VEHICLE_DOCUMENTS
+        : PERSONAL_DOCUMENTS;
+
+    const submittedField =
+      section === "vehicle"
+        ? "vehicleSubmittedAt"
+        : "personalSubmittedAt";
+
     try {
-      const auth = window.rudolfDriverAuth;
+      const auth =
+        window.rudolfDriverAuth;
 
       if (!auth || !auth.uid) {
-        alert("Driver account is not ready yet.");
+        alert(
+          "Driver account is not ready yet."
+        );
         return;
       }
 
@@ -363,38 +477,63 @@
         return;
       }
 
-      if (statusOf(currentRecord) === "approved") {
-        alert("Your verification is already approved.");
+      if (
+        statusOf(
+          currentRecord,
+          section
+        ) === "approved"
+      ) {
+        alert(
+          "Your " +
+          sectionName.toLowerCase() +
+          " verification is already approved."
+        );
         return;
       }
 
       const button =
         document.getElementById(
-          "driver-verification-submit-btn"
+          section +
+          "-verification-submit-btn"
         );
 
       if (button) {
         button.disabled = true;
-        button.textContent = "Preparing documents...";
+        button.textContent =
+          "Preparing documents...";
       }
 
-      message("Preparing your documents...");
+      message(
+        "Preparing " +
+        sectionName.toLowerCase() +
+        " verification documents..."
+      );
 
-      const oldDocuments =
+      const oldSubmission =
         currentRecord &&
-        currentRecord.submission &&
-        currentRecord.submission.documents
-          ? currentRecord.submission.documents
+        currentRecord.submission
+          ? currentRecord.submission
           : {};
 
+      const oldDocuments =
+        oldSubmission.documents || {};
+
       const documents =
-        Object.assign({}, oldDocuments);
+        Object.assign(
+          {},
+          oldDocuments
+        );
 
       let newFileCount = 0;
 
-      for (const doc of DOCUMENTS) {
+      for (const doc of sectionDocuments) {
         const key = doc[0];
-        const input = document.getElementById(doc[1]);
+
+        const input =
+          document.getElementById(
+            doc[1]
+          );
+
         const label = doc[4];
 
         const file =
@@ -405,9 +544,14 @@
             : null;
 
         if (!file) {
-          if (!documents[key] || !documents[key].url) {
+          if (
+            !documents[key] ||
+            !documents[key].url
+          ) {
             throw new Error(
-              "Please choose " + label + "."
+              "Please choose " +
+              label +
+              "."
             );
           }
 
@@ -416,7 +560,11 @@
 
         newFileCount += 1;
 
-        message("Uploading " + label + "...");
+        message(
+          "Uploading " +
+          label +
+          "..."
+        );
 
         const path =
           "driver-verification/" +
@@ -426,7 +574,9 @@
           "/" +
           Date.now() +
           "-" +
-          cleanFileName(file.name);
+          cleanFileName(
+            file.name
+          );
 
         const uploaded =
           await uploadVerificationDocument(
@@ -435,38 +585,86 @@
             file
           );
 
-        documents[key] = uploaded;
+        documents[key] =
+          uploaded;
       }
 
+      const previousSubmitted =
+        Date.parse(
+          oldSubmission[
+            submittedField
+          ] || ""
+        ) || 0;
+
       if (
-        currentRecord &&
-        currentRecord.submission &&
+        previousSubmitted &&
         newFileCount === 0
       ) {
         throw new Error(
-          "Choose at least one new document before resubmitting."
+          "Choose at least one new " +
+          sectionName.toLowerCase() +
+          " document before resubmitting."
         );
       }
 
       let driverProfile = {};
+
       try {
-        driverProfile = JSON.parse(localStorage.getItem("rudolfDriverProfile") || "{}");
+        driverProfile =
+          JSON.parse(
+            localStorage.getItem(
+              "rudolfDriverProfile"
+            ) || "{}"
+          );
       } catch (error) {
         driverProfile = {};
       }
 
-      const submission = {
-        driverUid: auth.uid,
-        driverEmail: auth.email || "",
-        driverName: driverProfile.name || "",
-        driverPhone: localStorage.getItem("rudolfDriverContactPhone") || "",
-        vehicle: driverProfile.vehicle || "",
-        plate: driverProfile.plate || "",
-        submittedAt: new Date().toISOString(),
-        documents: documents
-      };
+      const now =
+        new Date().toISOString();
 
-      message("Sending for admin review...");
+      const submission =
+        Object.assign(
+          {},
+          oldSubmission,
+          {
+            driverUid:
+              auth.uid,
+
+            driverEmail:
+              auth.email || "",
+
+            driverName:
+              driverProfile.name || "",
+
+            driverPhone:
+              localStorage.getItem(
+                "rudolfDriverContactPhone"
+              ) || "",
+
+            vehicle:
+              driverProfile.vehicle || "",
+
+            plate:
+              driverProfile.plate || "",
+
+            submittedAt:
+              now,
+
+            documents:
+              documents
+          }
+        );
+
+      submission[
+        submittedField
+      ] = now;
+
+      message(
+        "Sending " +
+        sectionName.toLowerCase() +
+        " verification for admin review..."
+      );
 
       await window.rudolfCloud.write(
         "rudolfDriverVerification/" +
@@ -475,21 +673,43 @@
         submission
       );
 
-      DOCUMENTS.forEach(function (doc) {
-        const input =
-          document.getElementById(doc[1]);
+      sectionDocuments.forEach(
+        function (doc) {
+          const input =
+            document.getElementById(
+              doc[1]
+            );
 
-        if (input) {
-          input.value = "";
+          if (input) {
+            input.value = "";
+          }
         }
-      });
+      );
+
+      currentRecord =
+        Object.assign(
+          {},
+          currentRecord || {},
+          {
+            submission:
+              submission
+          }
+        );
+
+      render(
+        currentRecord
+      );
 
       message(
-        "✅ Documents submitted. Awaiting admin review."
+        "✅ " +
+        sectionName +
+        " verification submitted. Awaiting admin review."
       );
 
       alert(
-        "✅ Verification submitted successfully.\n\nStatus: Pending"
+        "✅ " +
+        sectionName +
+        " verification submitted successfully.\n\nStatus: Pending"
       );
 
     } catch (error) {
@@ -501,24 +721,30 @@
       message(
         "Submission issue: " +
         (
-          error && error.message
+          error &&
+          error.message
             ? error.message
             : "Unknown error"
         )
       );
 
       alert(
-        "Verification submission issue:\n" +
+        sectionName +
+        " verification submission issue:\n" +
         (
-          error && error.message
+          error &&
+          error.message
             ? error.message
             : "Unknown error"
         )
       );
 
-      renderStatus(currentRecord);
+      renderStatus(
+        currentRecord
+      );
     }
   }
+
 
   function startVerification() {
     if (started) return;

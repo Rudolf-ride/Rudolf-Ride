@@ -449,22 +449,22 @@
        Driver submission only.
        Admin review is separate.
        ========================================= -->
+  <!-- PERSONAL VERIFICATION -->
   <div class="driver-verification-card">
 
     <div class="driver-verification-heading">
       <div>
-        <h3>🛡️ Driver Verification</h3>
-        <p>Submit your required driver documents</p>
+        <h3>🪪 Personal Verification</h3>
+        <p>Verify your identity and driving credentials</p>
       </div>
 
       <span
-        id="driver-verification-status"
+        id="personal-verification-status"
         class="driver-verification-status verification-not-submitted"
       >
         Not submitted
       </span>
     </div>
-
 
     <div class="driver-verification-documents">
 
@@ -480,7 +480,6 @@
         </small>
       </label>
 
-
       <label class="driver-verification-document">
         <span>🚘 Driver's Licence</span>
         <input
@@ -492,46 +491,6 @@
           Not uploaded
         </small>
       </label>
-
-
-      <label class="driver-verification-document">
-        <span>📄 Vehicle Registration / VRC</span>
-        <input
-          type="file"
-          id="verification-vrc"
-          accept="image/*,.pdf,application/pdf"
-        >
-        <small id="verification-vrc-state">
-          Not uploaded
-        </small>
-      </label>
-
-
-      <label class="driver-verification-document">
-        <span>🛡️ Insurance</span>
-        <input
-          type="file"
-          id="verification-insurance"
-          accept="image/*,.pdf,application/pdf"
-        >
-        <small id="verification-insurance-state">
-          Not uploaded
-        </small>
-      </label>
-
-
-      <label class="driver-verification-document">
-        <span>✅ Roadworthy Certificate</span>
-        <input
-          type="file"
-          id="verification-roadworthy"
-          accept="image/*,.pdf,application/pdf"
-        >
-        <small id="verification-roadworthy-state">
-          Not uploaded
-        </small>
-      </label>
-
 
       <label class="driver-verification-document">
         <span>📷 Driver Photo / Selfie</span>
@@ -548,22 +507,93 @@
 
     </div>
 
+    <button
+      type="button"
+      id="personal-verification-submit-btn"
+      class="driver-verification-submit"
+      onclick="submitDriverVerification('personal')"
+    >
+      🪪 Submit Personal Verification
+    </button>
+
+  </div>
+
+
+  <!-- VEHICLE VERIFICATION -->
+  <div
+    class="driver-verification-card"
+    style="margin-top:16px;"
+  >
+
+    <div class="driver-verification-heading">
+      <div>
+        <h3>🚗 Vehicle Verification</h3>
+        <p>Verify the vehicle used for Rudolf Ride</p>
+      </div>
+
+      <span
+        id="vehicle-verification-status"
+        class="driver-verification-status verification-not-submitted"
+      >
+        Not submitted
+      </span>
+    </div>
+
+    <div class="driver-verification-documents">
+
+      <label class="driver-verification-document">
+        <span>📄 Vehicle Registration / VRC</span>
+        <input
+          type="file"
+          id="verification-vrc"
+          accept="image/*,.pdf,application/pdf"
+        >
+        <small id="verification-vrc-state">
+          Not uploaded
+        </small>
+      </label>
+
+      <label class="driver-verification-document">
+        <span>🛡️ Insurance</span>
+        <input
+          type="file"
+          id="verification-insurance"
+          accept="image/*,.pdf,application/pdf"
+        >
+        <small id="verification-insurance-state">
+          Not uploaded
+        </small>
+      </label>
+
+      <label class="driver-verification-document">
+        <span>✅ Roadworthy Certificate</span>
+        <input
+          type="file"
+          id="verification-roadworthy"
+          accept="image/*,.pdf,application/pdf"
+        >
+        <small id="verification-roadworthy-state">
+          Not uploaded
+        </small>
+      </label>
+
+    </div>
 
     <button
       type="button"
-      id="driver-verification-submit-btn"
+      id="vehicle-verification-submit-btn"
       class="driver-verification-submit"
-      onclick="submitDriverVerification()"
+      onclick="submitDriverVerification('vehicle')"
     >
-      🛡️ Submit for Verification
+      🚗 Submit Vehicle Verification
     </button>
 
-    <p
-      id="driver-verification-message"
-      class="driver-verification-message"
-    ></p>
-
   </div>
+
+  <p
+    id="driver-verification-message"
+    class="driver-verification-message"
+  ></p>
 
   </div>
   <!-- END SEPARATE VERIFICATION VIEW -->
