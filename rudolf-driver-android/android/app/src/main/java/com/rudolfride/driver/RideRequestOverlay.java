@@ -1,9 +1,11 @@
 package com.rudolfride.driver;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -24,9 +26,56 @@ public final class RideRequestOverlay {
     private static WindowManager manager;
     private static View panel;
     private static String lastId;
+    private static MediaPlayer backgroundRingtone;
     private static final Runnable TIMEOUT = RideRequestOverlay::hide;
 
     private RideRequestOverlay() {}
+
+    private static boolean isAppInForeground() {
+        ActivityManager.RunningAppProcessInfo state =
+                new ActivityManager.RunningAppProcessInfo();
+        ActivityManager.getMyMemoryState(state);
+
+        return state.importance ==
+                ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+                || state.importance ==
+                ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE;
+    }
+
+    private static void startBackgroundRingtone(Context app) {
+        stopBackgroundRingtone();
+
+        try {
+            backgroundRingtone = MediaPlayer.create(app, R.raw.old_bell);
+            if (backgroundRingtone != null) {
+                backgroundRingtone.setLooping(true);
+                backgroundRingtone.start();
+            }
+        } catch (RuntimeException error) {
+            Log.e(TAG, "Background ringtone start failed", error);
+            stopBackgroundRingtone();
+        }
+    }
+
+    private static void stopBackgroundRingtone() {
+        if (backgroundRingtone == null) return;
+
+        try {
+            if (backgroundRingtone.isPlaying()) {
+                backgroundRingtone.stop();
+            }
+        } catch (RuntimeException error) {
+            Log.w(TAG, "Background ringtone stop failed", error);
+        }
+
+        try {
+            backgroundRingtone.release();
+        } catch (RuntimeException error) {
+            Log.w(TAG, "Background ringtone release failed", error);
+        }
+
+        backgroundRingtone = null;
+    }
 
     public static void show(
             Context context, String id, String pickup,
@@ -91,6 +140,8 @@ public final class RideRequestOverlay {
             String fare,
             String rideType,
             String rideId) {
+        boolean appWasForeground = isAppInForeground();
+
         Context context = new ContextThemeWrapper(
                 app, android.R.style.Theme_Material_Light_NoActionBar
         );
@@ -213,12 +264,18 @@ public final class RideRequestOverlay {
 
         panel = root;
         manager.addView(root, params);
+
+        if (!appWasForeground) {
+            startBackgroundRingtone(app);
+        }
+
         MAIN.postDelayed(TIMEOUT, 45000);
         Log.i(TAG, "Ride overlay displayed");
     }
 
     private static void hide() {
         MAIN.removeCallbacks(TIMEOUT);
+        stopBackgroundRingtone();
         if (manager != null && panel != null) {
             try {
                 manager.removeViewImmediate(panel);

@@ -14,6 +14,208 @@
 
   let listenerStarted = false;
 
+  /*
+   * 3R-DRSD-DRIVER-MESSAGE-TONE
+   * Phone 2 only.
+   *
+   * Rules:
+   * - First Firebase snapshot is silent history baseline.
+   * - Driver's own messages never make a tone.
+   * - Only newly appearing Passenger messages make a tone.
+   */
+  let messageSoundBaselineReady = false;
+  const knownMessageIds = new Set();
+  let messageAudioContext = null;
+
+
+  function playDriverMessageTone() {
+
+    try {
+
+      const AudioContextClass =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+      if (!AudioContextClass) {
+        return;
+      }
+
+      if (!messageAudioContext) {
+        messageAudioContext =
+          new AudioContextClass();
+      }
+
+
+      const playTone = function () {
+
+        const start =
+          messageAudioContext.currentTime;
+
+        [
+          {
+            delay: 0,
+            frequency: 880
+          },
+          {
+            delay: 0.14,
+            frequency: 1175
+          }
+        ].forEach(function (note) {
+
+          const oscillator =
+            messageAudioContext
+              .createOscillator();
+
+          const gain =
+            messageAudioContext
+              .createGain();
+
+          const noteStart =
+            start + note.delay;
+
+          const noteEnd =
+            noteStart + 0.11;
+
+          oscillator.type =
+            "sine";
+
+          oscillator.frequency
+            .setValueAtTime(
+              note.frequency,
+              noteStart
+            );
+
+          gain.gain
+            .setValueAtTime(
+              0.0001,
+              noteStart
+            );
+
+          gain.gain
+            .exponentialRampToValueAtTime(
+              0.22,
+              noteStart + 0.015
+            );
+
+          gain.gain
+            .exponentialRampToValueAtTime(
+              0.0001,
+              noteEnd
+            );
+
+          oscillator
+            .connect(gain);
+
+          gain
+            .connect(
+              messageAudioContext.destination
+            );
+
+          oscillator
+            .start(noteStart);
+
+          oscillator
+            .stop(noteEnd + 0.02);
+
+        });
+
+      };
+
+
+      if (
+        messageAudioContext.state ===
+        "suspended"
+      ) {
+
+        messageAudioContext
+          .resume()
+          .then(playTone)
+          .catch(function () {});
+
+      } else {
+
+        playTone();
+
+      }
+
+    } catch (error) {
+
+      console.warn(
+        "Driver message tone unavailable:",
+        error
+      );
+
+    }
+
+  }
+
+
+  function handleDriverMessageSound(data) {
+
+    const messages =
+      normalizeMessages(data);
+
+
+    /*
+     * Initial Firebase load is HISTORY.
+     * Remember it without making sound.
+     */
+    if (!messageSoundBaselineReady) {
+
+      messages.forEach(function (message) {
+
+        knownMessageIds.add(
+          message.id
+        );
+
+      });
+
+      messageSoundBaselineReady = true;
+
+      return;
+    }
+
+
+    let passengerMessageArrived =
+      false;
+
+
+    messages.forEach(function (message) {
+
+      if (
+        knownMessageIds.has(
+          message.id
+        )
+      ) {
+        return;
+      }
+
+
+      knownMessageIds.add(
+        message.id
+      );
+
+
+      if (
+        message.sender !== "driver"
+      ) {
+
+        passengerMessageArrived =
+          true;
+
+      }
+
+    });
+
+
+    if (passengerMessageArrived) {
+
+      playDriverMessageTone();
+
+    }
+
+  }
+
 
   function getMessageList() {
     return document.getElementById(
@@ -238,6 +440,8 @@
     window.rudolfCloud.listen(
       MESSAGE_PATH,
       function (data) {
+
+        handleDriverMessageSound(data);
 
         renderDriverMessages(data);
 
