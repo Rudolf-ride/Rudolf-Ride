@@ -69,11 +69,16 @@
         style="display:none;"
       >
         <button
-          id="driver-messages-menu-btn"
+          id="driver-email-menu-btn"
           type="button"
-          onclick="showDriverSection('messages'); document.getElementById('driver-menu-dropdown').style.display='none';"
         >
-          💬 Messages
+          ✉️ Email
+          <span
+            id="driver-contact-email"
+            style="display:block;font-size:11px;overflow-wrap:anywhere;"
+          >
+            Loading...
+          </span>
         </button>
 
         <button
@@ -194,20 +199,24 @@
 
   <div class="vehicle-info">
 
-    <div>
-      🚗
-      <strong>Vehicle</strong>
-      <p id="driver-vehicle">
-        Toyota Corolla
+    <div onclick="editDriverContactPhone()" role="button" style="cursor:pointer;">
+      📞
+      <strong>Phone</strong>
+      <p id="driver-contact-phone" style="font-size:12px;">
+        Tap to set
       </p>
     </div>
 
 
-    <div>
-      🔖
-      <strong>Plate</strong>
-      <p id="driver-plate">
-        GR 12345
+    <div
+      onclick="showDriverSection('messages')"
+      role="button"
+      style="cursor:pointer;"
+    >
+      💬
+      <strong>Messages</strong>
+      <p style="font-size:12px;">
+        Open chat
       </p>
     </div>
 
