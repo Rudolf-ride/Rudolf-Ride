@@ -686,7 +686,8 @@ function changeRideStatus(newStatus) {
       name: driverProfile.name || "Rudolf",
       vehicle: driverProfile.vehicle || "Toyota Corolla",
       plate: driverProfile.plate || "GR 12345",
-      rating: 4.8
+      rating: 4.8,
+      phone: localStorage.getItem("rudolfDriverContactPhone") || ""
     };
 
   }
@@ -1961,6 +1962,83 @@ window.editDriverProfile = editDriverProfile;
 document.addEventListener("DOMContentLoaded", function () {
   applyDriverProfile();
 });
+
+
+/* =========================================
+   3R DRS-D — DRIVER CONTACT PHONE
+   Home contact only. Separate from vehicle,
+   plate and Mobile Money withdrawal details.
+   ========================================= */
+
+const DRIVER_CONTACT_PHONE_KEY =
+  "rudolfDriverContactPhone";
+
+function applyDriverContactPhone() {
+  const phone =
+    localStorage.getItem(
+      DRIVER_CONTACT_PHONE_KEY
+    ) || "";
+
+  const phoneEl =
+    document.getElementById(
+      "driver-contact-phone"
+    );
+
+  if (phoneEl) {
+    phoneEl.textContent =
+      phone || "Tap to set";
+  }
+}
+
+function editDriverContactPhone() {
+  const currentPhone =
+    localStorage.getItem(
+      DRIVER_CONTACT_PHONE_KEY
+    ) || "";
+
+  const entered = prompt(
+    "Driver contact phone number:",
+    currentPhone
+  );
+
+  if (entered === null) return;
+
+  const cleanPhone =
+    entered
+      .trim()
+      .replace(/\s+/g, "")
+      .replace(/-/g, "");
+
+  if (
+    !/^0\d{9}$/.test(cleanPhone) &&
+    !/^\+233\d{9}$/.test(cleanPhone) &&
+    !/^233\d{9}$/.test(cleanPhone)
+  ) {
+    alert(
+      "Please enter a valid Ghana phone number."
+    );
+    return;
+  }
+
+  localStorage.setItem(
+    DRIVER_CONTACT_PHONE_KEY,
+    cleanPhone
+  );
+
+  applyDriverContactPhone();
+
+  alert(
+    "✅ Driver contact number saved."
+  );
+}
+
+window.editDriverContactPhone =
+  editDriverContactPhone;
+
+document.addEventListener(
+  "DOMContentLoaded",
+  applyDriverContactPhone
+);
 
 
 /* =========================================
