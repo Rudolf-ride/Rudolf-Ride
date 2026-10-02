@@ -66,7 +66,13 @@ onAuthStateChanged(
     // for Driver-owned verification records.
     window.rudolfDriverAuth = {
       uid: user.uid,
-      email: user.email || ""
+      email: user.email || "",
+
+      // 3R DRS-D — short-lived Firebase ID token.
+      // Token is requested only when secure upload needs it.
+      getIdToken: function () {
+        return user.getIdToken();
+      }
     };
 
     window.dispatchEvent(

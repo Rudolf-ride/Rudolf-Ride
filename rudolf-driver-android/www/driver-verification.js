@@ -168,6 +168,182 @@
     });
   }
 
+  // 3R DRS-D — Private Vercel Blob upload bridge.
+  // Firebase RTDB remains the verification record/status store.
+  const DRIVER_VERIFICATION_UPLOAD_URL =
+    "https://paystack-backend-gamma.vercel.app/driver-verification-upload-url";
+
+
+  function verificationContentType(file) {
+
+    const supplied =
+      String(
+        file && file.type
+          ? file.type
+          : ""
+      )
+        .trim()
+        .toLowerCase();
+
+    if (
+      supplied === "application/pdf" ||
+      supplied.startsWith("image/")
+    ) {
+      return supplied;
+    }
+
+    const name =
+      String(
+        file && file.name
+          ? file.name
+          : ""
+      ).toLowerCase();
+
+    if (name.endsWith(".pdf")) {
+      return "application/pdf";
+    }
+
+    if (
+      name.endsWith(".jpg") ||
+      name.endsWith(".jpeg")
+    ) {
+      return "image/jpeg";
+    }
+
+    if (name.endsWith(".png")) {
+      return "image/png";
+    }
+
+    if (name.endsWith(".webp")) {
+      return "image/webp";
+    }
+
+    if (name.endsWith(".heic")) {
+      return "image/heic";
+    }
+
+    if (name.endsWith(".heif")) {
+      return "image/heif";
+    }
+
+    throw new Error(
+      "Only image or PDF verification documents are supported."
+    );
+  }
+
+
+  async function uploadVerificationDocument(
+    auth,
+    path,
+    file
+  ) {
+
+    if (
+      !auth ||
+      typeof auth.getIdToken !== "function"
+    ) {
+      throw new Error(
+        "Driver secure authentication is not ready."
+      );
+    }
+
+    const idToken =
+      await auth.getIdToken();
+
+    if (!idToken) {
+      throw new Error(
+        "Driver authentication could not be verified."
+      );
+    }
+
+    const contentType =
+      verificationContentType(file);
+
+    const permissionResponse =
+      await fetch(
+        DRIVER_VERIFICATION_UPLOAD_URL,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+
+            "Authorization":
+              "Bearer " + idToken
+          },
+
+          body: JSON.stringify({
+            path: path,
+            contentType: contentType,
+            size: file.size
+          })
+        }
+      );
+
+    let permission = {};
+
+    try {
+      permission =
+        await permissionResponse.json();
+    } catch (error) {
+      permission = {};
+    }
+
+    if (
+      !permissionResponse.ok ||
+      !permission.success ||
+      !permission.uploadUrl
+    ) {
+      throw new Error(
+        permission.message ||
+        "Could not prepare secure document upload."
+      );
+    }
+
+    const uploadResponse =
+      await fetch(
+        permission.uploadUrl,
+        {
+          method: "PUT",
+
+          headers: {
+            "Content-Type":
+              contentType
+          },
+
+          body: file
+        }
+      );
+
+    if (!uploadResponse.ok) {
+      throw new Error(
+        "Secure document upload failed."
+      );
+    }
+
+    return {
+      url:
+        permission.blobUrl || "",
+
+      path:
+        permission.path || path,
+
+      name:
+        file.name,
+
+      type:
+        contentType,
+
+      size:
+        file.size || 0,
+
+      uploadedAt:
+        new Date().toISOString()
+    };
+  }
+
+
   async function submitDriverVerification() {
     try {
       const auth = window.rudolfDriverAuth;
@@ -177,8 +353,13 @@
         return;
       }
 
-      if (!window.rudolfCloud || !window.rudolfStorage) {
-        alert("Firebase is not ready yet.");
+      if (
+        !window.rudolfCloud ||
+        typeof auth.getIdToken !== "function"
+      ) {
+        alert(
+          "Driver secure upload is not ready yet."
+        );
         return;
       }
 
@@ -248,7 +429,8 @@
           cleanFileName(file.name);
 
         const uploaded =
-          await window.rudolfStorage.upload(
+          await uploadVerificationDocument(
+            auth,
             path,
             file
           );
@@ -344,8 +526,7 @@
     if (
       !window.rudolfDriverAuth ||
       !window.rudolfDriverAuth.uid ||
-      !window.rudolfCloud ||
-      !window.rudolfStorage
+      !window.rudolfCloud
     ) {
       return;
     }
