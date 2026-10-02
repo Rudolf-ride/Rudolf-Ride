@@ -3924,3 +3924,68 @@ renderDriverRides = function () {
 // =====================================
 // 3R PASSENGER CANCELLATION HISTORY — CONNECTION END
 // =====================================
+
+
+/* =========================================================
+   3R DRS-D — CALL CURRENT PASSENGER
+   Phone 2 Driver only.
+   Reads passengerPhone from the active Firebase ride and
+   opens the device phone dialer.
+========================================================= */
+
+async function callCurrentPassenger() {
+  try {
+    const response = await fetch(
+      "https://rudolf-ride-default-rtdb.europe-west1.firebasedatabase.app/rudolfCurrentRide.json",
+      { cache: "no-store" }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "Unable to read current ride (" + response.status + ")"
+      );
+    }
+
+    const ride = await response.json();
+
+    if (!ride || typeof ride !== "object") {
+      alert("There is no active passenger ride to call.");
+      return;
+    }
+
+    const endedStatuses = new Set([
+      "Ride declined",
+      "Ride canceled",
+      "Ride cancelled",
+      "Ride completed"
+    ]);
+
+    if (endedStatuses.has(String(ride.status || "").trim())) {
+      alert("There is no active passenger ride to call.");
+      return;
+    }
+
+    const passengerPhone = String(
+      ride.passengerPhone || ""
+    ).trim();
+
+    if (!passengerPhone) {
+      alert("Passenger phone number is not available for this ride.");
+      return;
+    }
+
+    const dialNumber = passengerPhone.replace(/[^\d+]/g, "");
+
+    if (!dialNumber) {
+      alert("Passenger phone number is invalid.");
+      return;
+    }
+
+    window.location.href = "tel:" + dialNumber;
+  } catch (error) {
+    console.error("Call passenger error:", error);
+    alert("Unable to open the passenger phone number right now.");
+  }
+}
+
+window.callCurrentPassenger = callCurrentPassenger;
