@@ -377,6 +377,128 @@
 
   </div>
 
+
+  <!-- =========================================
+       3R DRS-D — DRIVER VERIFICATION
+       Driver submission only.
+       Admin review is separate.
+       ========================================= -->
+  <div class="driver-verification-card">
+
+    <div class="driver-verification-heading">
+      <div>
+        <h3>🛡️ Driver Verification</h3>
+        <p>Submit your required driver documents</p>
+      </div>
+
+      <span
+        id="driver-verification-status"
+        class="driver-verification-status verification-not-submitted"
+      >
+        Not submitted
+      </span>
+    </div>
+
+
+    <div class="driver-verification-documents">
+
+      <label class="driver-verification-document">
+        <span>🪪 Ghana Card</span>
+        <input
+          type="file"
+          id="verification-ghana-card"
+          accept="image/*,.pdf,application/pdf"
+        >
+        <small id="verification-ghana-card-state">
+          Not uploaded
+        </small>
+      </label>
+
+
+      <label class="driver-verification-document">
+        <span>🚘 Driver's Licence</span>
+        <input
+          type="file"
+          id="verification-driver-licence"
+          accept="image/*,.pdf,application/pdf"
+        >
+        <small id="verification-driver-licence-state">
+          Not uploaded
+        </small>
+      </label>
+
+
+      <label class="driver-verification-document">
+        <span>📄 Vehicle Registration / VRC</span>
+        <input
+          type="file"
+          id="verification-vrc"
+          accept="image/*,.pdf,application/pdf"
+        >
+        <small id="verification-vrc-state">
+          Not uploaded
+        </small>
+      </label>
+
+
+      <label class="driver-verification-document">
+        <span>🛡️ Insurance</span>
+        <input
+          type="file"
+          id="verification-insurance"
+          accept="image/*,.pdf,application/pdf"
+        >
+        <small id="verification-insurance-state">
+          Not uploaded
+        </small>
+      </label>
+
+
+      <label class="driver-verification-document">
+        <span>✅ Roadworthy Certificate</span>
+        <input
+          type="file"
+          id="verification-roadworthy"
+          accept="image/*,.pdf,application/pdf"
+        >
+        <small id="verification-roadworthy-state">
+          Not uploaded
+        </small>
+      </label>
+
+
+      <label class="driver-verification-document">
+        <span>📷 Driver Photo / Selfie</span>
+        <input
+          type="file"
+          id="verification-driver-photo"
+          accept="image/*"
+          capture="user"
+        >
+        <small id="verification-driver-photo-state">
+          Not uploaded
+        </small>
+      </label>
+
+    </div>
+
+
+    <button
+      type="button"
+      id="driver-verification-submit-btn"
+      class="driver-verification-submit"
+      onclick="submitDriverVerification()"
+    >
+      🛡️ Submit for Verification
+    </button>
+
+    <p
+      id="driver-verification-message"
+      class="driver-verification-message"
+    ></p>
+
+  </div>
+
 </section>
 
   <!-- RIDES SECTION -->
@@ -779,6 +901,7 @@
 
   <!-- 3R: old in-app ride popup disabled; native popup is active -->
 
+<script src="driver-verification.js"></script>
 <script src="driver-messages.js"></script>
 <script src="mobile-push.js" defer></script>
 <script src="ride-overlay-actions.js"></script>

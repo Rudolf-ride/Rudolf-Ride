@@ -15,6 +15,14 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
 
 import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-storage.js";
+
+
+import {
   getMessaging,
   getToken,
   onMessage
@@ -53,6 +61,45 @@ const app = initializeApp(firebaseConfig);
 
 // Database
 const database = getDatabase(app);
+
+
+// Storage
+const storage = getStorage(app);
+
+
+// 3R DRS-D — Driver verification Storage bridge
+window.rudolfStorage = {
+
+  upload: async function(path, file) {
+
+    const fileRef =
+      storageRef(
+        storage,
+        path
+      );
+
+    await uploadBytes(
+      fileRef,
+      file
+    );
+
+    const url =
+      await getDownloadURL(
+        fileRef
+      );
+
+    return {
+      url: url,
+      path: path,
+      name: file.name,
+      type: file.type || "",
+      size: file.size || 0,
+      uploadedAt:
+        new Date().toISOString()
+    };
+  }
+
+};
 
 
 // Cloud bridge

@@ -62,6 +62,22 @@ onAuthStateChanged(
       user.email
     );
 
+    // 3R DRS-D — expose authenticated Driver identity
+    // for Driver-owned verification records.
+    window.rudolfDriverAuth = {
+      uid: user.uid,
+      email: user.email || ""
+    };
+
+    window.dispatchEvent(
+      new CustomEvent(
+        "rudolfDriverAuthReady",
+        {
+          detail: window.rudolfDriverAuth
+        }
+      )
+    );
+
     const driverEmailEl =
       document.getElementById(
         "driver-contact-email"
