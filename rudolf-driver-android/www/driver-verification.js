@@ -94,7 +94,25 @@
       }
 
     } else if (status === "rejected") {
-      badge.textContent = "Rejected";
+      const reviewRoot =
+        record && record.review
+          ? record.review
+          : {};
+
+      const sectionReview =
+        reviewRoot[section] || {};
+
+      const rejectionReason =
+        String(
+          sectionReview.reason || ""
+        ).trim();
+
+      badge.textContent =
+        rejectionReason
+          ? "Rejected — Reason: " +
+            rejectionReason
+          : "Rejected";
+
       badge.classList.add(
         "verification-rejected"
       );
