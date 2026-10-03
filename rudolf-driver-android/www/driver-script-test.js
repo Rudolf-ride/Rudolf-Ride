@@ -687,6 +687,7 @@ function changeRideStatus(newStatus) {
       vehicle: driverProfile.vehicle || "Toyota Corolla",
       plate: driverProfile.plate || "GR 12345",
       rating: 4.8,
+      photoUrl: driverProfile.photoUrl || "",
       phone: localStorage.getItem("rudolfDriverContactPhone") || ""
     };
 
@@ -2072,6 +2073,406 @@ function stopRideRingtone() {
 
 
 /* =========================================
+   3R DRS-D — DRIVER PUBLIC PROFILE PHOTO
+   Separate from verification selfie/documents.
+   ========================================= */
+
+const DRIVER_PROFILE_PHOTO_UPLOAD_URL =
+  "https://paystack-backend-gamma.vercel.app/driver-profile-photo-upload-url";
+
+
+function setDriverProfilePhotoState(
+  text
+) {
+  const state =
+    document.getElementById(
+      "driver-profile-photo-state"
+    );
+
+  if (state) {
+    state.textContent =
+      text || "";
+  }
+}
+
+
+function applyDriverAvatarPhoto(
+  photoUrl
+) {
+  const avatars = [
+    document.getElementById(
+      "header-driver-avatar"
+    ),
+
+    document.getElementById(
+      "profile-driver-avatar"
+    )
+  ];
+
+  avatars.forEach(
+    function (avatar) {
+
+      if (!avatar) {
+        return;
+      }
+
+      if (photoUrl) {
+
+        avatar.textContent = "";
+
+        avatar.style.backgroundImage =
+          'url("' +
+          String(photoUrl)
+            .replaceAll('"', "%22") +
+          '")';
+
+        avatar.style.backgroundSize =
+          "cover";
+
+        avatar.style.backgroundPosition =
+          "center";
+
+        avatar.style.backgroundRepeat =
+          "no-repeat";
+
+      } else {
+
+        avatar.style.backgroundImage =
+          "none";
+
+        avatar.textContent = "R";
+      }
+    }
+  );
+}
+
+
+function chooseDriverProfilePhoto() {
+
+  const input =
+    document.getElementById(
+      "driver-profile-photo-input"
+    );
+
+  if (input) {
+    input.click();
+  }
+}
+
+
+async function uploadDriverProfilePhoto(
+  file
+) {
+
+  const button =
+    document.getElementById(
+      "driver-profile-photo-button"
+    );
+
+  try {
+
+    if (!file) {
+      return;
+    }
+
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp"
+    ];
+
+
+    if (
+      !allowedTypes.includes(
+        String(
+          file.type || ""
+        ).toLowerCase()
+      )
+    ) {
+      throw new Error(
+        "Choose a JPG, PNG or WEBP image."
+      );
+    }
+
+
+    if (
+      !file.size ||
+      file.size >
+        5 * 1024 * 1024
+    ) {
+      throw new Error(
+        "Profile picture must be 5 MB or smaller."
+      );
+    }
+
+
+    const auth =
+      window.rudolfDriverAuth;
+
+
+    if (
+      !auth ||
+      !auth.uid ||
+      typeof auth.getIdToken !==
+        "function"
+    ) {
+      throw new Error(
+        "Driver authentication is not ready."
+      );
+    }
+
+
+    if (button) {
+      button.disabled = true;
+      button.textContent =
+        "Uploading...";
+    }
+
+
+    setDriverProfilePhotoState(
+      "Preparing profile picture..."
+    );
+
+
+    const idToken =
+      await auth.getIdToken();
+
+
+    const permissionResponse =
+      await fetch(
+        DRIVER_PROFILE_PHOTO_UPLOAD_URL,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+
+            "Authorization":
+              "Bearer " +
+              idToken
+          },
+
+          body: JSON.stringify({
+            name:
+              file.name || "profile.jpg",
+
+            contentType:
+              file.type,
+
+            size:
+              file.size
+          })
+        }
+      );
+
+
+    let permission = {};
+
+    try {
+      permission =
+        await permissionResponse.json();
+    } catch (error) {
+      permission = {};
+    }
+
+
+    if (
+      !permissionResponse.ok ||
+      !permission.success ||
+      !permission.uploadUrl ||
+      !permission.photoUrl
+    ) {
+      throw new Error(
+        permission.message ||
+        "Could not prepare profile picture upload."
+      );
+    }
+
+
+    setDriverProfilePhotoState(
+      "Uploading profile picture..."
+    );
+
+
+    const uploadResponse =
+      await fetch(
+        permission.uploadUrl,
+        {
+          method: "PUT",
+
+          headers: {
+            "Content-Type":
+              file.type
+          },
+
+          body:
+            file
+        }
+      );
+
+
+    if (!uploadResponse.ok) {
+      throw new Error(
+        "Profile picture upload failed."
+      );
+    }
+
+
+    const profile =
+      readStoredObject(
+        "rudolfDriverProfile",
+        {}
+      );
+
+
+    profile.photoUrl =
+      permission.photoUrl;
+
+    profile.photoPath =
+      permission.path || "";
+
+    profile.photoUpdatedAt =
+      new Date().toISOString();
+
+
+    saveStoredObject(
+      "rudolfDriverProfile",
+      profile
+    );
+
+
+    applyDriverProfile();
+
+
+    setDriverProfilePhotoState(
+      "✅ Profile picture uploaded"
+    );
+
+
+    alert(
+      "✅ Profile picture updated successfully"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Driver profile picture upload:",
+      error
+    );
+
+    setDriverProfilePhotoState(
+      "❌ " +
+      (
+        error &&
+        error.message
+          ? error.message
+          : "Upload failed"
+      )
+    );
+
+    alert(
+      "❌ " +
+      (
+        error &&
+        error.message
+          ? error.message
+          : "Profile picture upload failed"
+      )
+    );
+
+  } finally {
+
+    if (button) {
+      button.disabled = false;
+      button.textContent =
+        "📷 Choose Profile Picture";
+    }
+  }
+}
+
+
+function initDriverProfilePhotoUpload() {
+
+  const input =
+    document.getElementById(
+      "driver-profile-photo-input"
+    );
+
+  if (
+    input &&
+    input.dataset.profilePhotoBound !==
+      "yes"
+  ) {
+
+    input.dataset.profilePhotoBound =
+      "yes";
+
+    input.addEventListener(
+      "change",
+      function () {
+
+        const file =
+          input.files &&
+          input.files[0]
+            ? input.files[0]
+            : null;
+
+        if (file) {
+          uploadDriverProfilePhoto(
+            file
+          );
+        }
+
+        input.value = "";
+      }
+    );
+  }
+
+
+  const profile =
+    readStoredObject(
+      "rudolfDriverProfile",
+      {}
+    );
+
+
+  if (profile.photoUrl) {
+
+    setDriverProfilePhotoState(
+      "✅ Profile picture ready"
+    );
+
+    applyDriverAvatarPhoto(
+      profile.photoUrl
+    );
+  }
+}
+
+
+window.chooseDriverProfilePhoto =
+  chooseDriverProfilePhoto;
+
+
+if (
+  document.readyState ===
+    "loading"
+) {
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    initDriverProfilePhotoUpload
+  );
+
+} else {
+
+  initDriverProfilePhotoUpload();
+}
+
+
+/* =========================================
    RUDOLF RIDE — EDIT DRIVER PROFILE
    ========================================= */
 
@@ -2104,11 +2505,25 @@ function editDriverProfile() {
   const plate = prompt("Plate number:", currentPlate);
   if (plate === null) return;
 
-  const profile = {
-    name: name.trim() || currentName,
-    vehicle: vehicle.trim() || currentVehicle,
-    plate: plate.trim().toUpperCase() || currentPlate
-  };
+  const profile =
+    Object.assign(
+      {},
+      savedProfile,
+      {
+        name:
+          name.trim() ||
+          currentName,
+
+        vehicle:
+          vehicle.trim() ||
+          currentVehicle,
+
+        plate:
+          plate.trim()
+            .toUpperCase() ||
+          currentPlate
+      }
+    );
 
   localStorage.setItem(
     "rudolfDriverProfile",
@@ -2139,6 +2554,10 @@ function applyDriverProfile() {
     const plateEl = document.getElementById("profile-driver-plate");
     if (plateEl) plateEl.textContent = profile.plate;
   }
+
+  applyDriverAvatarPhoto(
+    profile.photoUrl || ""
+  );
 }
 
 window.editDriverProfile = editDriverProfile;

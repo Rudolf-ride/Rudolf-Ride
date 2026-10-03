@@ -35,7 +35,10 @@
 
   <div class="driver-brand">
 
-    <div class="profile-avatar">
+    <div
+      class="profile-avatar"
+      id="header-driver-avatar"
+    >
       R
     </div>
 
@@ -324,7 +327,10 @@
 
     <div class="profile-top">
 
-      <div class="profile-avatar">
+      <div
+        class="profile-avatar"
+        id="profile-driver-avatar"
+      >
         R
       </div>
 
@@ -339,6 +345,67 @@
 
     </div>
 
+
+
+    <!-- =========================================
+         3R DRS-D — PUBLIC DRIVER PROFILE PHOTO
+         Separate from verification documents.
+         ========================================= -->
+    <div
+      id="driver-profile-photo-controls"
+      style="
+        margin:16px 0;
+        padding:14px;
+        border:1px solid #e2e8f0;
+        border-radius:14px;
+      "
+    >
+      <strong
+        style="
+          display:block;
+          margin-bottom:6px;
+        "
+      >
+        📷 Profile Picture
+      </strong>
+
+      <small
+        style="
+          display:block;
+          margin-bottom:10px;
+          color:#64748b;
+        "
+      >
+        This picture can be shown to passengers.
+      </small>
+
+      <input
+        type="file"
+        id="driver-profile-photo-input"
+        accept="image/jpeg,image/png,image/webp"
+        style="display:none;"
+      >
+
+      <button
+        type="button"
+        class="edit-profile-btn"
+        id="driver-profile-photo-button"
+        onclick="chooseDriverProfilePhoto()"
+      >
+        📷 Choose Profile Picture
+      </button>
+
+      <small
+        id="driver-profile-photo-state"
+        style="
+          display:block;
+          margin-top:8px;
+          color:#64748b;
+        "
+      >
+        No profile picture uploaded
+      </small>
+    </div>
 
     <div class="profile-rating">
       ⭐ <strong id="profile-driver-rating">4.8</strong>
