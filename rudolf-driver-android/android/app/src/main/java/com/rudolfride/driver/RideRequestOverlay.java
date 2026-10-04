@@ -192,6 +192,14 @@ public final class RideRequestOverlay {
                 dp(context, 64)
         ));
 
+        // 3R DRS-D: share the existing flexible area equally.
+        View gapAfterPickup = new View(context);
+        root.addView(gapAfterPickup, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0,
+                1.0f
+        ));
+
         TextView rideTypeView =
                 text(context, rideTypeLabel, 20, true);
         rideTypeView.setGravity(Gravity.CENTER);
@@ -199,6 +207,14 @@ public final class RideRequestOverlay {
         root.addView(rideTypeView, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 dp(context, 52)
+        ));
+
+        // 3R DRS-D: second equal share of the flexible area.
+        View gapAfterRideType = new View(context);
+        root.addView(gapAfterRideType, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0,
+                1.0f
         ));
 
         TextView destinationLabel =
