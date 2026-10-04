@@ -164,9 +164,6 @@ public final class RideRequestOverlay {
         LinearLayout details = new LinearLayout(context);
         details.setOrientation(LinearLayout.VERTICAL);
 
-        details.addView(text(context, "PICKUP", 12, true));
-        details.addView(text(context, value(pickup, "Pickup location"), 19, false));
-
         String rawRideType = value(rideType, "Rudolf Ride");
         String normalizedRideType = rawRideType.toLowerCase();
         String rideTypeLabel;
@@ -184,7 +181,12 @@ public final class RideRequestOverlay {
         TextView rideTypeView =
                 text(context, rideTypeLabel, 20, true);
         rideTypeView.setGravity(Gravity.CENTER);
+        rideTypeView.setTextColor(Color.rgb(0, 120, 64));
         details.addView(rideTypeView);
+
+        details.addView(text(context, "PICKUP", 12, true));
+        details.addView(text(context, value(pickup, "Pickup location"), 19, false));
+
 
         details.addView(text(context, "DESTINATION", 12, true));
         details.addView(text(context, value(destination, "Destination"), 19, false));
@@ -193,11 +195,17 @@ public final class RideRequestOverlay {
         if (amount.matches("[0-9]+([.][0-9]+)?")) {
             amount = "GH₵ " + amount;
         }
-        details.addView(text(context, "FARE: " + amount, 23, true));
         scroll.addView(details);
         root.addView(scroll, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
         ));
+
+        TextView fareView = text(context, "FARE: " + amount, 23, true);
+        fareView.setGravity(Gravity.CENTER);
+        fareView.setTextColor(Color.rgb(0, 120, 64));
+        fareView.setBackgroundColor(Color.rgb(242, 250, 246));
+        fareView.setPadding(dp(context, 16), dp(context, 12), dp(context, 16), dp(context, 12));
+        root.addView(fareView);
 
         // RUDOLF_OVERLAY_ACTION_BUTTONS
         LinearLayout actions = new LinearLayout(context);
