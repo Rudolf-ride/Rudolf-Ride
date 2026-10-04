@@ -27,6 +27,458 @@
   const knownMessageIds = new Set();
   let driverMessageAudio = null;
 
+  /*
+   * 3R-DRSD-DRIVER-MESSAGE-VISUAL-ALERT
+   * Phone 2 Driver only.
+   *
+   * - Red unread badge on Home > Messages.
+   * - Compact Passenger-message popup.
+   * - OPEN CHAT goes directly to Messages.
+   * - Closing popup does NOT clear unread badge.
+   * - Opening Messages clears unread badge.
+   */
+  let driverMessageUnreadCount = 0;
+  let driverMessagePopupTimer = null;
+
+
+  function getDriverMessagesHomeCard() {
+
+    const cards =
+      document.querySelectorAll(
+        ".vehicle-info > div"
+      );
+
+    for (const card of cards) {
+
+      const strong =
+        card.querySelector("strong");
+
+      if (
+        strong &&
+        strong.textContent.trim() ===
+          "Messages"
+      ) {
+        return card;
+      }
+
+    }
+
+    return null;
+
+  }
+
+
+  function isDriverMessagesOpen() {
+
+    const section =
+      document.getElementById(
+        "driver-messages-section"
+      );
+
+    if (!section) {
+      return false;
+    }
+
+    return (
+      window.getComputedStyle(section)
+        .display !== "none"
+    );
+
+  }
+
+
+  function clearDriverMessageUnread() {
+
+    driverMessageUnreadCount = 0;
+
+    const badge =
+      document.getElementById(
+        "driver-message-unread-badge"
+      );
+
+    if (badge) {
+      badge.textContent = "";
+      badge.style.display = "none";
+    }
+
+  }
+
+
+  function hideDriverMessagePopup() {
+
+    if (driverMessagePopupTimer) {
+
+      clearTimeout(
+        driverMessagePopupTimer
+      );
+
+      driverMessagePopupTimer = null;
+
+    }
+
+    const popup =
+      document.getElementById(
+        "driver-message-popup"
+      );
+
+    if (popup) {
+      popup.classList.remove(
+        "is-visible"
+      );
+    }
+
+  }
+
+
+  function openDriverMessagesFromAlert() {
+
+    clearDriverMessageUnread();
+    hideDriverMessagePopup();
+
+    if (
+      typeof window.showDriverSection ===
+        "function"
+    ) {
+
+      window.showDriverSection(
+        "messages"
+      );
+
+    }
+
+  }
+
+
+  function ensureDriverMessageVisualAlert() {
+
+    const card =
+      getDriverMessagesHomeCard();
+
+    if (card) {
+
+      card.classList.add(
+        "rr-driver-message-home-card"
+      );
+
+      let badge =
+        document.getElementById(
+          "driver-message-unread-badge"
+        );
+
+      if (!badge) {
+
+        badge =
+          document.createElement("span");
+
+        badge.id =
+          "driver-message-unread-badge";
+
+        badge.className =
+          "rr-driver-message-unread-badge";
+
+        badge.setAttribute(
+          "aria-label",
+          "Unread passenger messages"
+        );
+
+        badge.style.display =
+          "none";
+
+        card.appendChild(badge);
+
+      }
+
+
+      if (
+        !card.dataset
+          .driverMessageReadHandler
+      ) {
+
+        card.dataset
+          .driverMessageReadHandler =
+            "1";
+
+        card.addEventListener(
+          "click",
+          function () {
+
+            clearDriverMessageUnread();
+            hideDriverMessagePopup();
+
+          }
+        );
+
+      }
+
+    }
+
+
+    let popup =
+      document.getElementById(
+        "driver-message-popup"
+      );
+
+    if (!popup) {
+
+      popup =
+        document.createElement("div");
+
+      popup.id =
+        "driver-message-popup";
+
+      popup.className =
+        "rr-driver-message-popup";
+
+      popup.setAttribute(
+        "role",
+        "alert"
+      );
+
+      popup.setAttribute(
+        "aria-live",
+        "assertive"
+      );
+
+
+      const header =
+        document.createElement("div");
+
+      header.className =
+        "rr-driver-message-popup-header";
+
+
+      const title =
+        document.createElement("strong");
+
+      title.className =
+        "rr-driver-message-popup-title";
+
+      title.textContent =
+        "💬 New message from Passenger";
+
+
+      const closeButton =
+        document.createElement(
+          "button"
+        );
+
+      closeButton.type =
+        "button";
+
+      closeButton.className =
+        "rr-driver-message-popup-close";
+
+      closeButton.textContent =
+        "×";
+
+      closeButton.setAttribute(
+        "aria-label",
+        "Close message alert"
+      );
+
+      closeButton.addEventListener(
+        "click",
+        hideDriverMessagePopup
+      );
+
+
+      header.appendChild(title);
+      header.appendChild(closeButton);
+
+
+      const preview =
+        document.createElement("div");
+
+      preview.className =
+        "rr-driver-message-popup-preview";
+
+
+      const actions =
+        document.createElement("div");
+
+      actions.className =
+        "rr-driver-message-popup-actions";
+
+
+      const openButton =
+        document.createElement(
+          "button"
+        );
+
+      openButton.type =
+        "button";
+
+      openButton.className =
+        "rr-driver-message-popup-open";
+
+      openButton.textContent =
+        "OPEN CHAT";
+
+      openButton.addEventListener(
+        "click",
+        openDriverMessagesFromAlert
+      );
+
+
+      actions.appendChild(openButton);
+
+      popup.appendChild(header);
+      popup.appendChild(preview);
+      popup.appendChild(actions);
+
+      document.body.appendChild(popup);
+
+    }
+
+
+    const messagesSection =
+      document.getElementById(
+        "driver-messages-section"
+      );
+
+    if (
+      messagesSection &&
+      !messagesSection.dataset
+        .driverMessageUnreadObserver
+    ) {
+
+      messagesSection.dataset
+        .driverMessageUnreadObserver =
+          "1";
+
+      const observer =
+        new MutationObserver(
+          function () {
+
+            if (
+              isDriverMessagesOpen()
+            ) {
+
+              clearDriverMessageUnread();
+              hideDriverMessagePopup();
+
+            }
+
+          }
+        );
+
+      observer.observe(
+        messagesSection,
+        {
+          attributes: true,
+          attributeFilter: [
+            "style",
+            "class"
+          ]
+        }
+      );
+
+    }
+
+  }
+
+
+  function showDriverMessageVisualAlert(
+    message,
+    arrivedCount
+  ) {
+
+    ensureDriverMessageVisualAlert();
+
+
+    /*
+     * If Driver is already inside Messages,
+     * the message is considered seen.
+     */
+    if (isDriverMessagesOpen()) {
+
+      clearDriverMessageUnread();
+      hideDriverMessagePopup();
+
+      return;
+
+    }
+
+
+    const count =
+      Math.max(
+        Number(arrivedCount) || 1,
+        1
+      );
+
+    driverMessageUnreadCount +=
+      count;
+
+
+    const badge =
+      document.getElementById(
+        "driver-message-unread-badge"
+      );
+
+    if (badge) {
+
+      badge.textContent =
+        driverMessageUnreadCount > 99
+          ? "99+"
+          : String(
+              driverMessageUnreadCount
+            );
+
+      badge.style.display =
+        "flex";
+
+    }
+
+
+    const popup =
+      document.getElementById(
+        "driver-message-popup"
+      );
+
+    if (!popup) {
+      return;
+    }
+
+
+    const preview =
+      popup.querySelector(
+        ".rr-driver-message-popup-preview"
+      );
+
+    if (preview) {
+
+      preview.textContent =
+        message &&
+        message.text
+          ? message.text
+          : "New message received.";
+
+    }
+
+
+    popup.classList.add(
+      "is-visible"
+    );
+
+
+    if (driverMessagePopupTimer) {
+
+      clearTimeout(
+        driverMessagePopupTimer
+      );
+
+    }
+
+
+    driverMessagePopupTimer =
+      setTimeout(
+        hideDriverMessagePopup,
+        7000
+      );
+
+  }
+
+
 
   function getDriverMessageAudio() {
 
@@ -120,6 +572,12 @@
     let passengerMessageArrived =
       false;
 
+    let latestPassengerMessage =
+      null;
+
+    let newPassengerMessageCount =
+      0;
+
 
     messages.forEach(function (message) {
 
@@ -144,6 +602,12 @@
         passengerMessageArrived =
           true;
 
+        latestPassengerMessage =
+          message;
+
+        newPassengerMessageCount +=
+          1;
+
       }
 
     });
@@ -152,6 +616,11 @@
     if (passengerMessageArrived) {
 
       playDriverMessageTone();
+
+      showDriverMessageVisualAlert(
+        latestPassengerMessage,
+        newPassengerMessageCount
+      );
 
     }
 
@@ -447,6 +916,9 @@
     if (!form || !input) {
       return;
     }
+
+
+    ensureDriverMessageVisualAlert();
 
 
     if (!startDriverMessageListener()) {
