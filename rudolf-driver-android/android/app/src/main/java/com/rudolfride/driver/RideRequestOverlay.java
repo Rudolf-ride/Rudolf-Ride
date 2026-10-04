@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 public final class RideRequestOverlay {
@@ -158,11 +157,11 @@ public final class RideRequestOverlay {
         TextView title = text(context, "Rudolf Ride — NEW REQUEST", 20, true);
         title.setTextColor(Color.WHITE);
         title.setBackgroundColor(Color.rgb(0, 150, 80));
-        root.addView(title);
-
-        ScrollView scroll = new ScrollView(context);
-        LinearLayout details = new LinearLayout(context);
-        details.setOrientation(LinearLayout.VERTICAL);
+        title.setGravity(Gravity.CENTER_VERTICAL);
+        root.addView(title, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(context, 56)
+        ));
 
         String rawRideType = value(rideType, "Rudolf Ride");
         String normalizedRideType = rawRideType.toLowerCase();
@@ -178,40 +177,74 @@ public final class RideRequestOverlay {
             rideTypeLabel = "Rudolf Ride";
         }
 
+        TextView pickupLabel = text(context, "PICKUP", 12, true);
+        pickupLabel.setGravity(Gravity.CENTER_VERTICAL);
+        root.addView(pickupLabel, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(context, 30)
+        ));
+
+        TextView pickupView =
+                text(context, value(pickup, "Pickup location"), 19, false);
+        pickupView.setGravity(Gravity.CENTER_VERTICAL);
+        root.addView(pickupView, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(context, 64)
+        ));
+
         TextView rideTypeView =
                 text(context, rideTypeLabel, 20, true);
         rideTypeView.setGravity(Gravity.CENTER);
         rideTypeView.setTextColor(Color.rgb(0, 120, 64));
-        details.addView(rideTypeView);
+        root.addView(rideTypeView, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(context, 52)
+        ));
 
-        details.addView(text(context, "PICKUP", 12, true));
-        details.addView(text(context, value(pickup, "Pickup location"), 19, false));
+        TextView destinationLabel =
+                text(context, "DESTINATION", 12, true);
+        destinationLabel.setGravity(Gravity.CENTER_VERTICAL);
+        root.addView(destinationLabel, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(context, 30)
+        ));
 
+        TextView destinationView =
+                text(context, value(destination, "Destination"), 19, false);
+        destinationView.setGravity(Gravity.CENTER_VERTICAL);
+        root.addView(destinationView, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(context, 64)
+        ));
 
-        details.addView(text(context, "DESTINATION", 12, true));
-        details.addView(text(context, value(destination, "Destination"), 19, false));
+        View staticSpace = new View(context);
+        root.addView(staticSpace, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(context, 96)
+        ));
 
         String amount = value(fare, "GH₵ --");
         if (amount.matches("[0-9]+([.][0-9]+)?")) {
             amount = "GH₵ " + amount;
         }
-        scroll.addView(details);
-        root.addView(scroll, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
-        ));
 
-        TextView fareView = text(context, "FARE: " + amount, 23, true);
+        TextView fareView =
+                text(context, "FARE: " + amount, 23, true);
         fareView.setGravity(Gravity.CENTER);
         fareView.setTextColor(Color.rgb(0, 120, 64));
         fareView.setBackgroundColor(Color.rgb(242, 250, 246));
-        fareView.setPadding(dp(context, 16), dp(context, 12), dp(context, 16), dp(context, 12));
-        root.addView(fareView);
+
+        root.addView(fareView, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(context, 60)
+        ));
 
         // RUDOLF_OVERLAY_ACTION_BUTTONS
         LinearLayout actions = new LinearLayout(context);
         actions.setOrientation(LinearLayout.HORIZONTAL);
         actions.setPadding(dp(context, 12), dp(context, 4),
                 dp(context, 12), dp(context, 4));
+        actions.setGravity(Gravity.CENTER);
 
         Button decline = new Button(context);
         decline.setText("DECLINE");
@@ -221,7 +254,7 @@ public final class RideRequestOverlay {
                         Color.rgb(185, 28, 28)));
         decline.setEnabled(rideId != null && !rideId.trim().isEmpty()); decline.setOnClickListener(v -> { if (RideOverlayActions.submit(app, rideId, "decline")) hide(); });
         actions.addView(decline, new LinearLayout.LayoutParams(
-                0, dp(context, 56), 1f));
+                dp(context, 150), dp(context, 56)));
 
         Button accept = new Button(context);
         accept.setText("ACCEPT");
@@ -232,13 +265,26 @@ public final class RideRequestOverlay {
         accept.setEnabled(rideId != null && !rideId.trim().isEmpty()); accept.setOnClickListener(v -> { if (RideOverlayActions.submit(app, rideId, "accept")) hide(); });
         LinearLayout.LayoutParams acceptParams =
                 new LinearLayout.LayoutParams(
-                        0, dp(context, 56), 1f);
+                        dp(context, 150), dp(context, 56));
         acceptParams.leftMargin = dp(context, 10);
         actions.addView(accept, acceptParams);
 
-        root.addView(actions);
-        root.addView(text(context,
-                "Tap Accept or Decline to continue in the driver app.", 12, false));
+        root.addView(actions, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(context, 64)
+        ));
+
+        TextView instruction = text(
+                context,
+                "Tap Accept or Decline to continue in the driver app.",
+                12,
+                false
+        );
+        instruction.setGravity(Gravity.CENTER_VERTICAL);
+        root.addView(instruction, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(context, 40)
+        ));
 
         Button close = new Button(context);
         close.setText("CLOSE");
