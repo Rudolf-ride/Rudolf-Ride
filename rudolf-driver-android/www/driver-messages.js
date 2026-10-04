@@ -25,123 +25,64 @@
    */
   let messageSoundBaselineReady = false;
   const knownMessageIds = new Set();
-  let messageAudioContext = null;
+  let driverMessageAudio = null;
+
+
+  function getDriverMessageAudio() {
+
+    if (!driverMessageAudio) {
+
+      driverMessageAudio =
+        new Audio(
+          "driver-chat-tone.mp3"
+        );
+
+      driverMessageAudio.preload =
+        "auto";
+
+      driverMessageAudio.volume =
+        1.0;
+
+    }
+
+    return driverMessageAudio;
+
+  }
 
 
   function playDriverMessageTone() {
 
     try {
 
-      const AudioContextClass =
-        window.AudioContext ||
-        window.webkitAudioContext;
+      const audio =
+        getDriverMessageAudio();
 
-      if (!AudioContextClass) {
-        return;
-      }
+      audio.pause();
+      audio.currentTime = 0;
 
-      if (!messageAudioContext) {
-        messageAudioContext =
-          new AudioContextClass();
-      }
-
-
-      const playTone = function () {
-
-        const start =
-          messageAudioContext.currentTime;
-
-        [
-          {
-            delay: 0,
-            frequency: 880
-          },
-          {
-            delay: 0.14,
-            frequency: 1175
-          }
-        ].forEach(function (note) {
-
-          const oscillator =
-            messageAudioContext
-              .createOscillator();
-
-          const gain =
-            messageAudioContext
-              .createGain();
-
-          const noteStart =
-            start + note.delay;
-
-          const noteEnd =
-            noteStart + 0.11;
-
-          oscillator.type =
-            "sine";
-
-          oscillator.frequency
-            .setValueAtTime(
-              note.frequency,
-              noteStart
-            );
-
-          gain.gain
-            .setValueAtTime(
-              0.0001,
-              noteStart
-            );
-
-          gain.gain
-            .exponentialRampToValueAtTime(
-              0.22,
-              noteStart + 0.015
-            );
-
-          gain.gain
-            .exponentialRampToValueAtTime(
-              0.0001,
-              noteEnd
-            );
-
-          oscillator
-            .connect(gain);
-
-          gain
-            .connect(
-              messageAudioContext.destination
-            );
-
-          oscillator
-            .start(noteStart);
-
-          oscillator
-            .stop(noteEnd + 0.02);
-
-        });
-
-      };
-
+      const playResult =
+        audio.play();
 
       if (
-        messageAudioContext.state ===
-        "suspended"
+        playResult &&
+        typeof playResult.catch === "function"
       ) {
 
-        messageAudioContext
-          .resume()
-          .then(playTone)
-          .catch(function () {});
+        playResult.catch(function (error) {
 
-      } else {
+          console.warn(
+            "Driver passenger-message tone unavailable:",
+            error
+          );
 
-        playTone();
+        });
 
       }
 
     } catch (error) {
 
       console.warn(
-        "Driver message tone unavailable:",
+        "Driver passenger-message tone unavailable:",
         error
       );
 
@@ -197,7 +138,7 @@
 
 
       if (
-        message.sender !== "driver"
+        message.sender === "passenger"
       ) {
 
         passengerMessageArrived =
