@@ -109,6 +109,7 @@ function toggleDriverAvailability() {
   updateDriverAvailability();
 
   if (!isOnline) {
+    stopRideRingtone();
     stopDriverLiveLocation();
   }
 }
@@ -627,7 +628,10 @@ function startCloudRideListener() {
         }
 
         // Ring only for a new ride waiting for the driver
-        if (ride.status === "Searching for driver") {
+        if (
+          ride.status === "Searching for driver" &&
+          isOnline
+        ) {
           playRideRingtone();
         } else {
           stopRideRingtone();
