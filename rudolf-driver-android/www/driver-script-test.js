@@ -587,6 +587,99 @@ function startCloudRideListener() {
           stopRideRingtone();
           stopDriverLiveLocation();
 
+          /*
+           * 3R DRS-D — CANCELLATION OWNERSHIP GUARD
+           *
+           * A passenger cancellation belongs in Driver history
+           * only when this Driver had already accepted/owned
+           * the same ride.
+           *
+           * This prevents:
+           * Driver offline -> passenger books -> passenger cancels
+           * from creating a Driver cancellation receipt.
+           */
+          const localRideBeforeCancel =
+            getCurrentRide();
+
+          const sameRideAsLocal =
+            !!localRideBeforeCancel &&
+            (
+              (
+                ride.rideId &&
+                localRideBeforeCancel.rideId &&
+                String(ride.rideId) ===
+                  String(localRideBeforeCancel.rideId)
+              ) ||
+              (
+                ride.createdAt &&
+                localRideBeforeCancel.createdAt &&
+                String(ride.createdAt) ===
+                  String(localRideBeforeCancel.createdAt)
+              ) ||
+              (
+                !ride.rideId &&
+                !localRideBeforeCancel.rideId &&
+                !ride.createdAt &&
+                !localRideBeforeCancel.createdAt &&
+                String(ride.pickup || "") ===
+                  String(localRideBeforeCancel.pickup || "") &&
+                String(ride.destination || "") ===
+                  String(localRideBeforeCancel.destination || "") &&
+                String(ride.fare || "") ===
+                  String(localRideBeforeCancel.fare || "")
+              )
+            );
+
+          const incomingRideHasDriver =
+            !!(
+              ride.driver &&
+              typeof ride.driver === "object" &&
+              Object.keys(ride.driver).length > 0
+            );
+
+          const localRideWasDriverOwned =
+            sameRideAsLocal &&
+            (
+              (
+                localRideBeforeCancel.driver &&
+                typeof localRideBeforeCancel.driver === "object" &&
+                Object.keys(
+                  localRideBeforeCancel.driver
+                ).length > 0
+              ) ||
+              [
+                "Ride accepted",
+                "Driver accepted your ride",
+                "Driver is on the way",
+                "Driver has arrived at pickup",
+                "Trip started"
+              ].includes(
+                localRideBeforeCancel.status
+              )
+            );
+
+          const driverOwnedCancellation =
+            incomingRideHasDriver ||
+            localRideWasDriverOwned;
+
+          if (!driverOwnedCancellation) {
+            localStorage.removeItem(
+              CURRENT_RIDE_KEY
+            );
+
+            lastRideSignature =
+              "closed|" +
+              getRideSignature(ride);
+
+            resetDriverForNextRide();
+
+            console.log(
+              "3R DRS-D: ignored cancellation for unaccepted ride"
+            );
+
+            return;
+          }
+
           // 3R-DPS-B — preserve passenger cancellation
           try {
             const isNewPassengerCancellation =
