@@ -220,7 +220,8 @@ public final class RideRequestOverlay {
         View staticSpace = new View(context);
         root.addView(staticSpace, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                dp(context, 96)
+                0,
+                1.0f
         ));
 
         String amount = value(fare, "GH₵ --");
