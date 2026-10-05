@@ -101,6 +101,13 @@
         </button>
 
         <button
+          id="driver-message-admin-btn"
+          type="button"
+        >
+          💬 Message Admin
+        </button>
+
+        <button
           id="driver-logout-btn"
           type="button"
         >
@@ -1003,6 +1010,109 @@
   ></p>
 </section>
 
+<!-- 3R DRS-D: DRIVER ↔ ADMIN CONVERSATION -->
+<div
+  id="driver-admin-message-modal"
+  style="display:none;position:fixed;inset:0;z-index:5000;"
+>
+  <div
+    id="driver-admin-message-backdrop"
+    style="position:absolute;inset:0;background:rgba(0,0,0,.55);"
+  ></div>
+
+  <section
+    style="position:relative;z-index:2;width:min(92vw,560px);height:min(78vh,680px);margin:11vh auto 0;background:#fff;border-radius:20px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);"
+    aria-label="Conversation with Admin"
+  >
+    <header
+      style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #e5e7eb;"
+    >
+      <div>
+        <strong style="font-size:18px;">💬 Admin</strong>
+        <div style="font-size:12px;color:#6b7280;margin-top:3px;">
+          Driver support conversation
+        </div>
+      </div>
+
+      <button
+        id="driver-admin-message-close"
+        type="button"
+        style="border:0;background:#f3f4f6;border-radius:10px;font-size:22px;width:40px;height:40px;"
+      >
+        ×
+      </button>
+    </header>
+
+    <div
+      id="driver-admin-message-list"
+      style="flex:1;overflow-y:auto;padding:16px;background:#f8fafc;"
+    ></div>
+
+    <form
+      id="driver-admin-message-form"
+      style="display:flex;gap:8px;padding:12px;border-top:1px solid #e5e7eb;background:#fff;"
+    >
+      <input
+        id="driver-admin-message-input"
+        type="text"
+        autocomplete="off"
+        placeholder="Message Admin..."
+        style="flex:1;min-width:0;border:1px solid #d1d5db;border-radius:12px;padding:12px;"
+      />
+
+      <button
+        type="submit"
+        style="border:0;border-radius:12px;padding:0 17px;background:#111827;color:#fff;font-weight:800;"
+      >
+        Send
+      </button>
+    </form>
+
+    <div
+      id="driver-admin-message-status"
+      style="min-height:18px;padding:0 14px 8px;font-size:12px;color:#b91c1c;"
+    ></div>
+  </section>
+</div>
+
+<style>
+.driver-admin-message {
+  max-width:82%;
+  margin-bottom:10px;
+  padding:10px 12px;
+  border-radius:14px;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+}
+.driver-admin-message-own {
+  margin-left:auto;
+  background:#111827;
+  color:#fff;
+}
+.driver-admin-message-admin {
+  margin-right:auto;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  color:#111827;
+}
+.driver-admin-message-label {
+  font-size:11px;
+  font-weight:900;
+  margin-bottom:4px;
+  opacity:.75;
+}
+.driver-admin-message-time {
+  font-size:10px;
+  margin-top:5px;
+  opacity:.65;
+}
+.driver-admin-empty {
+  text-align:center;
+  color:#6b7280;
+  padding:30px 15px;
+}
+</style>
+
 <div id="rr-ride-action-dock" class="request-buttons" aria-live="polite"></div>
 <nav class="driver-bottom-nav">
   <button
@@ -1069,6 +1179,7 @@
 
 <script src="driver-verification.js"></script>
 <script src="driver-messages.js"></script>
+<script type="module" src="admin-messages.js"></script>
 <script src="mobile-push.js" defer></script>
 <script src="ride-overlay-actions.js"></script>
 <script src="driver-verification-auth-test.js"></script>
