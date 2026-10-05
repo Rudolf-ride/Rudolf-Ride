@@ -88,9 +88,9 @@
       );
 
       if (button) {
-        button.disabled = true;
+        button.disabled = false;
         button.textContent =
-          "✅ " + name + " Verification Approved";
+          "✏️ Update " + name + " Verification";
       }
 
     } else if (status === "rejected") {
@@ -208,7 +208,7 @@
           : vehicleApproved;
 
       if (input) {
-        input.disabled = approved;
+        input.disabled = false;
       }
 
       if (!state) return;
@@ -501,12 +501,16 @@
           section
         ) === "approved"
       ) {
-        alert(
+        const confirmed = confirm(
           "Your " +
           sectionName.toLowerCase() +
-          " verification is already approved."
+          " verification is already approved. " +
+          "Updating documents will send this section for review again. Continue?"
         );
-        return;
+
+        if (!confirmed) {
+          return;
+        }
       }
 
       const button =
