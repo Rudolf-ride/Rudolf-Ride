@@ -15,6 +15,7 @@ let isOnline =
 
 let driverLocationWatchId = null;
 let driverLocationMap = null;
+let passengerPickupMarker = null;
 let driverLocationMarker = null;
 let lastRideSignature = "";
 
@@ -433,6 +434,8 @@ if (rideType) {
     }
   }
 
+syncPassengerPickupMarker(ride);
+
 if (
   [
     "Ride accepted",
@@ -449,6 +452,7 @@ if (
 }
 
 function resetDriverForNextRide(message) {
+  clearPassengerPickupMarker();
   const rideStatus =
     document.getElementById("ride-status");
 
@@ -1456,6 +1460,10 @@ function showDriverLocationMap(
 
     driverLocationMap.invalidateSize();
 
+    syncPassengerPickupMarker(
+      getCurrentRide()
+    );
+
     return;
   }
 
@@ -1501,10 +1509,198 @@ function showDriverLocationMap(
     }
   ).addTo(driverLocationMap);
 
+  syncPassengerPickupMarker(
+    getCurrentRide()
+  );
+
   setTimeout(function () {
     driverLocationMap.invalidateSize();
   }, 150);
 }
+
+
+/* =====================================
+   3R DRS-D — PASSENGER PICKUP MARKER
+
+   READ ONLY:
+   - pickupLatitude
+   - pickupLongitude
+
+   PROTECTED:
+   - Driver GPS watcher
+   - liveDriverLocation
+   - Online / Offline
+===================================== */
+
+function clearPassengerPickupMarker() {
+
+  if (
+    passengerPickupMarker &&
+    driverLocationMap
+  ) {
+    driverLocationMap.removeLayer(
+      passengerPickupMarker
+    );
+  }
+
+  passengerPickupMarker = null;
+}
+
+
+function syncPassengerPickupMarker(ride) {
+
+  const visibleStatuses = [
+    "Ride accepted",
+    "Driver accepted your ride",
+    "Driver is on the way",
+    "Driver has arrived at pickup"
+  ];
+
+  if (
+    !ride ||
+    !visibleStatuses.includes(
+      ride.status
+    )
+  ) {
+    clearPassengerPickupMarker();
+    return;
+  }
+
+
+  const latitude =
+    Number(
+      ride.pickupLatitude
+    );
+
+  const longitude =
+    Number(
+      ride.pickupLongitude
+    );
+
+
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude)
+  ) {
+    clearPassengerPickupMarker();
+    return;
+  }
+
+
+  if (
+    !driverLocationMap ||
+    typeof L === "undefined"
+  ) {
+    return;
+  }
+
+
+  const pickupLocation = [
+    latitude,
+    longitude
+  ];
+
+
+  if (passengerPickupMarker) {
+
+    passengerPickupMarker.setLatLng(
+      pickupLocation
+    );
+
+    if (driverLocationMarker) {
+
+      try {
+
+        driverLocationMap.fitBounds(
+          [
+            driverLocationMarker
+              .getLatLng(),
+
+            passengerPickupMarker
+              .getLatLng()
+          ],
+          {
+            padding: [45, 45],
+            maxZoom: 17
+          }
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Passenger pickup map bounds:",
+          error
+        );
+      }
+    }
+
+    return;
+  }
+
+
+  const passengerPickupIcon =
+    L.divIcon({
+      className:
+        "rudolf-passenger-pickup-icon",
+
+      html:
+        '<div class="rudolf-passenger-pickup-pin">' +
+          '<div class="rudolf-passenger-pickup-dot">👤</div>' +
+        '</div>',
+
+      iconSize: [48, 56],
+      iconAnchor: [24, 54],
+      popupAnchor: [0, -50]
+    });
+
+
+  passengerPickupMarker =
+    L.marker(
+      pickupLocation,
+      {
+        icon:
+          passengerPickupIcon,
+
+        title:
+          "Passenger pickup"
+      }
+    )
+      .addTo(
+        driverLocationMap
+      )
+      .bindPopup(
+        "<strong>📍 Passenger Pickup</strong>"
+      );
+
+
+  if (driverLocationMarker) {
+
+    try {
+
+      driverLocationMap.fitBounds(
+        [
+          driverLocationMarker
+            .getLatLng(),
+
+          passengerPickupMarker
+            .getLatLng()
+        ],
+        {
+          padding: [45, 45],
+          maxZoom: 17
+        }
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Passenger pickup map bounds:",
+        error
+      );
+    }
+  }
+}
+
 
 function startDriverLiveLocation() {
   const gpsStatus =
