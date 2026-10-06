@@ -15,6 +15,549 @@ let isOnline =
 
 let driverLocationWatchId = null;
 
+
+/* =========================================
+   3R DRS-D — DRIVER ACCOUNT ENFORCEMENT
+
+   Admin controls:
+   active
+   suspended
+   blocked
+
+   Protected rule:
+   Go Offline is always allowed.
+   Go Online requires an active account.
+   GPS watcher itself is NOT changed.
+   ========================================= */
+
+const DRIVER_ACCOUNT_CONTROL_ROOT =
+  "rudolfDriverVerification";
+
+let driverAccountControlUnsubscribe =
+  null;
+
+let driverAccountControlListenerStarting =
+  false;
+
+
+function getEffectiveDriverAccountControlState(
+  control
+) {
+
+  const state =
+    String(
+      control &&
+      control.state
+        ? control.state
+        : "active"
+    ).toLowerCase();
+
+
+  if (state === "blocked") {
+    return "blocked";
+  }
+
+
+  if (state === "suspended") {
+
+    const until =
+      new Date(
+        control &&
+        control.suspendedUntil
+          ? control.suspendedUntil
+          : ""
+      ).getTime();
+
+
+    if (
+      Number.isFinite(until) &&
+      until > Date.now()
+    ) {
+      return "suspended";
+    }
+
+
+    /*
+     * Suspension date has passed.
+     * Driver may go Online again.
+     */
+    return "active";
+  }
+
+
+  return "active";
+}
+
+
+function formatDriverRestrictionUntil(
+  value
+) {
+
+  if (!value) {
+    return "";
+  }
+
+
+  const date =
+    new Date(value);
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "";
+  }
+
+
+  return date.toLocaleString();
+}
+
+
+function getDriverRestrictionMessage(
+  control
+) {
+
+  const state =
+    getEffectiveDriverAccountControlState(
+      control
+    );
+
+  const reason =
+    String(
+      control &&
+      control.reason
+        ? control.reason
+        : ""
+    ).trim();
+
+
+  if (state === "suspended") {
+
+    const until =
+      formatDriverRestrictionUntil(
+        control.suspendedUntil
+      );
+
+
+    let message =
+      "Account Suspended";
+
+
+    if (until) {
+
+      message +=
+        "\\n\\nYou cannot go Online until " +
+        until +
+        ".";
+    }
+
+
+    if (reason) {
+
+      message +=
+        "\\n\\nReason: " +
+        reason;
+    }
+
+
+    return message;
+  }
+
+
+  if (state === "blocked") {
+
+    let message =
+      "Account Blocked";
+
+
+    message +=
+      "\\n\\nYou cannot go Online.";
+
+
+    if (reason) {
+
+      message +=
+        "\\n\\nReason: " +
+        reason;
+    }
+
+
+    message +=
+      "\\n\\nContact Rudolf Ride Admin.";
+
+
+    return message;
+  }
+
+
+  return "";
+}
+
+
+function setDriverAvailabilityState(
+  nextOnline
+) {
+
+  isOnline =
+    Boolean(nextOnline);
+
+
+  localStorage.setItem(
+    DRIVER_ONLINE_KEY,
+    String(isOnline)
+  );
+
+
+  if (
+    window.rudolfCloud &&
+    typeof window.rudolfCloud.write ===
+      "function"
+  ) {
+
+    window.rudolfCloud
+      .write(
+        "rudolfDriverAvailability",
+        isOnline
+      )
+      .catch(function (error) {
+
+        console.error(
+          "Driver availability cloud write:",
+          error
+        );
+
+      });
+  }
+
+
+  updateDriverAvailability();
+
+
+  if (isOnline) {
+
+    /*
+     * Existing protected GPS controller.
+     * No extra watcher is created.
+     */
+    startDriverLiveLocation();
+
+  } else {
+
+    stopRideRingtone();
+
+    stopDriverLiveLocation();
+  }
+}
+
+
+function waitForDriverAccountControlReady() {
+
+  return new Promise(
+    function (
+      resolve,
+      reject
+    ) {
+
+      const startedAt =
+        Date.now();
+
+
+      const timer =
+        setInterval(
+          function () {
+
+            const authReady =
+              window.rudolfDriverAuth &&
+              window.rudolfDriverAuth.uid;
+
+            const cloudReady =
+              window.rudolfCloud &&
+              typeof window.rudolfCloud.read ===
+                "function" &&
+              typeof window.rudolfCloud.listen ===
+                "function";
+
+
+            if (
+              authReady &&
+              cloudReady
+            ) {
+
+              clearInterval(timer);
+
+              resolve({
+                uid:
+                  window
+                    .rudolfDriverAuth
+                    .uid
+              });
+
+              return;
+            }
+
+
+            if (
+              Date.now() -
+              startedAt >
+              8000
+            ) {
+
+              clearInterval(timer);
+
+              reject(
+                new Error(
+                  "Driver account status service is not ready."
+                )
+              );
+            }
+
+          },
+          100
+        );
+    }
+  );
+}
+
+
+async function readDriverAccountControl() {
+
+  const identity =
+    await waitForDriverAccountControlReady();
+
+
+  const path =
+    DRIVER_ACCOUNT_CONTROL_ROOT +
+    "/" +
+    identity.uid +
+    "/accountControl";
+
+
+  const control =
+    await window.rudolfCloud.read(
+      path
+    );
+
+
+  return (
+    control &&
+    typeof control === "object"
+  )
+    ? control
+    : {};
+}
+
+
+function enforceDriverRestriction(
+  control,
+  notifyDriver
+) {
+
+  const state =
+    getEffectiveDriverAccountControlState(
+      control
+    );
+
+
+  if (
+    state !== "suspended" &&
+    state !== "blocked"
+  ) {
+    return false;
+  }
+
+
+  const wasOnline =
+    isOnline;
+
+
+  if (isOnline) {
+
+    setDriverAvailabilityState(
+      false
+    );
+  }
+
+
+  if (
+    notifyDriver &&
+    wasOnline
+  ) {
+
+    alert(
+      getDriverRestrictionMessage(
+        control
+      )
+    );
+  }
+
+
+  return true;
+}
+
+
+async function startDriverAccountControlListener() {
+
+  if (
+    driverAccountControlUnsubscribe ||
+    driverAccountControlListenerStarting
+  ) {
+    return;
+  }
+
+
+  driverAccountControlListenerStarting =
+    true;
+
+
+  try {
+
+    const identity =
+      await waitForDriverAccountControlReady();
+
+
+    const path =
+      DRIVER_ACCOUNT_CONTROL_ROOT +
+      "/" +
+      identity.uid +
+      "/accountControl";
+
+
+    driverAccountControlUnsubscribe =
+      window.rudolfCloud.listen(
+        path,
+        function (control) {
+
+          const record =
+            control &&
+            typeof control === "object"
+              ? control
+              : {};
+
+
+          /*
+           * If Admin suspends or blocks an
+           * already-Online Driver, immediately
+           * force that Driver Offline.
+           */
+          enforceDriverRestriction(
+            record,
+            true
+          );
+
+        }
+      );
+
+
+    console.log(
+      "Driver account-control listener active"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Driver account-control listener:",
+      error
+    );
+
+
+    setTimeout(
+      startDriverAccountControlListener,
+      1500
+    );
+
+
+  } finally {
+
+    driverAccountControlListenerStarting =
+      false;
+  }
+}
+
+
+async function initializeDriverAccountControlEnforcement() {
+
+  const wasOnline =
+    isOnline;
+
+
+  try {
+
+    const control =
+      await readDriverAccountControl();
+
+
+    const restricted =
+      enforceDriverRestriction(
+        control,
+        false
+      );
+
+
+    if (restricted) {
+
+      if (wasOnline) {
+
+        alert(
+          getDriverRestrictionMessage(
+            control
+          )
+        );
+      }
+
+    } else if (isOnline) {
+
+      /*
+       * Account is allowed:
+       * resume the existing protected GPS.
+       */
+      startDriverLiveLocation();
+
+    } else {
+
+      stopDriverLiveLocation();
+    }
+
+
+  } catch (error) {
+
+    console.error(
+      "Driver account startup check:",
+      error
+    );
+
+
+    /*
+     * Fail closed:
+     * if account status cannot be verified,
+     * do not silently leave Driver Online.
+     */
+    if (isOnline) {
+
+      setDriverAvailabilityState(
+        false
+      );
+
+
+      alert(
+        "Unable to verify your Driver account status. " +
+        "You have been kept Offline. " +
+        "Check your internet connection and try again."
+      );
+
+    } else {
+
+      stopDriverLiveLocation();
+    }
+  }
+
+
+  startDriverAccountControlListener();
+}
+
+
 /*
  * 3R DRS-D GPS protection:
  * only one navigator.geolocation watcher may exist.
@@ -101,33 +644,88 @@ function saveCurrentRide(ride) {
   }
 }
 
-function toggleDriverAvailability() {
-  isOnline = !isOnline;
+async function toggleDriverAvailability() {
 
-  localStorage.setItem(
-    "rudolfDriverOnline",
-    String(isOnline)
-  );
-
-  window.rudolfCloud?.write(
-  "rudolfDriverAvailability",
-  isOnline
-);
-
-  updateDriverAvailability();
-
+  /*
+   * Going Offline is ALWAYS allowed.
+   */
   if (isOnline) {
-    /*
-     * Going Online resumes the protected single GPS watcher.
-     */
-    startDriverLiveLocation();
-  } else {
-    /*
-     * Going Offline pauses GPS and ride sound.
-     */
-    stopRideRingtone();
-    stopDriverLiveLocation();
+
+    setDriverAvailabilityState(
+      false
+    );
+
+    return;
   }
+
+
+  /*
+   * Going Online requires Admin account clearance.
+   */
+  let control;
+
+
+  try {
+
+    control =
+      await readDriverAccountControl();
+
+  } catch (error) {
+
+    console.error(
+      "Driver Online account check:",
+      error
+    );
+
+
+    setDriverAvailabilityState(
+      false
+    );
+
+
+    alert(
+      "Unable to verify your Driver account status. " +
+      "Please check your internet connection and try again."
+    );
+
+    return;
+  }
+
+
+  const state =
+    getEffectiveDriverAccountControlState(
+      control
+    );
+
+
+  if (
+    state === "suspended" ||
+    state === "blocked"
+  ) {
+
+    setDriverAvailabilityState(
+      false
+    );
+
+
+    alert(
+      getDriverRestrictionMessage(
+        control
+      )
+    );
+
+
+    return;
+  }
+
+
+  /*
+   * Active Driver:
+   * continue the existing Online + GPS flow.
+   */
+  setDriverAvailabilityState(
+    true
+  );
 }
 
 // =====================================
@@ -2286,15 +2884,12 @@ function initializeDriverApp() {
   loadCurrentRide();
 
   /*
-   * 3R DRS-D AUTO GPS:
-   * Online  -> tracking active
-   * Offline -> tracking paused
+   * 3R DRS-D ACCOUNT + GPS STARTUP:
+   *
+   * Verify Admin account control first.
+   * Only an Active Driver may resume Online GPS.
    */
-  if (isOnline) {
-    startDriverLiveLocation();
-  } else {
-    stopDriverLiveLocation();
-  }
+  initializeDriverAccountControlEnforcement();
 
   setInterval(
     loadCurrentRide,
