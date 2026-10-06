@@ -1,15 +1,6 @@
-import {
-  getApps,
-  getApp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-const app = getApps().length > 0 ? getApp() : null;
-const auth = app ? getAuth(app) : null;
+// 3R DRS-D — use the authenticated Driver identity
+// already supplied by driver-auth-guard.js.
+// No second Firebase Auth instance is required here.
 
 const MODAL_ID = "driver-admin-message-modal";
 const BACKDROP_ID = "driver-admin-message-backdrop";
@@ -229,21 +220,34 @@ function initializeModal() {
   }
 }
 
-if (auth) {
-  onAuthStateChanged(auth, user => {
-  if (!user) {
-    driverUid = null;
-    stopMessageListener();
-    return;
+function initializeDriverAdminMessaging() {
+  const identity = window.rudolfDriverAuth;
+
+  if (!identity || !identity.uid) {
+    return false;
   }
 
-  driverUid = user.uid;
+  driverUid = identity.uid;
 
   initializeButton();
   initializeModal();
-  });
-} else {
-  console.error("3R DRS-D Admin messaging could not start: Firebase app unavailable.");
+
+  console.log(
+    "3R DRS-D Driver ↔ Admin messaging ready for Driver:",
+    driverUid
+  );
+
+  return true;
+}
+
+if (!initializeDriverAdminMessaging()) {
+  window.addEventListener(
+    "rudolfDriverAuthReady",
+    function () {
+      initializeDriverAdminMessaging();
+    },
+    { once: true }
+  );
 }
 
 console.log("3R DRS-D Driver ↔ Admin messaging module loaded.");
