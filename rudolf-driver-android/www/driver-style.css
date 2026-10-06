@@ -3725,3 +3725,91 @@ body {
   font-weight: 900;
 }
 
+
+
+/* =========================================
+   3R DRS-D — LIVE SECURITY POPUP
+   UI only. Ride/GPS/availability untouched.
+   ========================================= */
+
+#driver-security-card {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+  box-sizing: border-box;
+
+  background:
+    rgba(15, 23, 42, 0.68);
+}
+
+#driver-security-card.driver-security-overlay {
+  display: flex;
+}
+
+.driver-security-dialog {
+  width: min(92vw, 420px);
+  box-sizing: border-box;
+
+  padding: 26px 22px;
+
+  background: #ffffff;
+
+  border:
+    2px solid #dc2626;
+
+  border-radius: 22px;
+
+  box-shadow:
+    0 22px 60px
+    rgba(0, 0, 0, 0.32);
+
+  text-align: center;
+}
+
+.driver-security-icon {
+  margin-bottom: 10px;
+
+  font-size: 42px;
+  line-height: 1;
+}
+
+#driver-security-title {
+  display: block;
+
+  margin-bottom: 12px;
+
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+#driver-security-message {
+  margin:
+    0 0 20px;
+
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+#driver-security-selfie-btn {
+  width: 100%;
+
+  padding: 15px 18px;
+
+  border: 0;
+  border-radius: 14px;
+
+  font-size: 17px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+#driver-security-selfie-btn:disabled {
+  opacity: 0.65;
+}
+

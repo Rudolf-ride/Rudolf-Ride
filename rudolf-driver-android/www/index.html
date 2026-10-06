@@ -260,33 +260,42 @@
 <!-- 3R DRS-D — ISOLATED LIVE SECURITY SELFIE -->
 <section
   id="driver-security-card"
-  class="availability-card"
-  style="display:none;border:2px solid #dc2626;"
+  class="driver-security-overlay"
+  style="display:none;"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="driver-security-title"
 >
-  <div>
-    <strong>
-      🛡️ Security Selfie Required
+  <div class="driver-security-dialog">
+
+    <div class="driver-security-icon">
+      🛡️
+    </div>
+
+    <strong id="driver-security-title">
+      Live Security Check
     </strong>
 
     <p id="driver-security-message">
       Admin has requested a fresh live security selfie.
     </p>
+
+    <button
+      id="driver-security-selfie-btn"
+      type="button"
+    >
+      📸 Take Security Selfie
+    </button>
+
+    <input
+      id="driver-security-selfie-input"
+      type="file"
+      accept="image/*"
+      capture="user"
+      style="display:none;"
+    >
+
   </div>
-
-  <button
-    id="driver-security-selfie-btn"
-    type="button"
-  >
-    📸 Take Security Selfie
-  </button>
-
-  <input
-    id="driver-security-selfie-input"
-    type="file"
-    accept="image/*"
-    capture="user"
-    style="display:none;"
-  >
 </section>
 
 <section class="availability-card">
