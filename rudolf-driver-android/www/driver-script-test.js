@@ -14,6 +14,14 @@ let isOnline =
   localStorage.getItem(DRIVER_ONLINE_KEY) === "true";
 
 let driverLocationWatchId = null;
+
+/*
+ * 3R DRS-D GPS protection:
+ * only one navigator.geolocation watcher may exist.
+ */
+let driverAccuracyCircle = null;
+let driverLastKnownLocation = null;
+let driverMapFollow = true;
 let driverLocationMap = null;
 let driverLocationMarker = null;
 let lastRideSignature = "";
@@ -108,7 +116,15 @@ function toggleDriverAvailability() {
 
   updateDriverAvailability();
 
-  if (!isOnline) {
+  if (isOnline) {
+    /*
+     * Going Online resumes the protected single GPS watcher.
+     */
+    startDriverLiveLocation();
+  } else {
+    /*
+     * Going Offline pauses GPS and ride sound.
+     */
     stopRideRingtone();
     stopDriverLiveLocation();
   }
@@ -1510,7 +1526,8 @@ function stopDriverLiveLocation() {
 
 function showDriverLocationMap(
   latitude,
-  longitude
+  longitude,
+  accuracy
 ) {
   const mapBox =
     document.getElementById(
@@ -1544,14 +1561,36 @@ function showDriverLocationMap(
   ];
 
   if (driverLocationMap) {
-    driverLocationMap.setView(
-      location,
-      17
-    );
+    /*
+     * Follow the driver smoothly unless the driver
+     * manually drags the map.
+     */
+    if (driverMapFollow) {
+      driverLocationMap.panTo(
+        location,
+        {
+          animate: true,
+          duration: 0.5
+        }
+      );
+    }
 
     driverLocationMarker.setLatLng(
       location
     );
+
+    if (driverAccuracyCircle) {
+      driverAccuracyCircle.setLatLng(
+        location
+      );
+
+      driverAccuracyCircle.setRadius(
+        Math.max(
+          5,
+          Number(accuracy) || 5
+        )
+      );
+    }
 
     driverLocationMap.invalidateSize();
 
@@ -1590,8 +1629,35 @@ function showDriverLocationMap(
       .addTo(driverLocationMap)
       .bindPopup(
         "Your live driver location"
-      )
-      .openPopup();
+      );
+
+  /*
+   * Accuracy circle gives the driver a modern visual
+   * indication of GPS precision.
+   */
+  driverAccuracyCircle =
+    L.circle(
+      location,
+      {
+        radius: Math.max(
+          5,
+          Number(accuracy) || 5
+        ),
+        weight: 1,
+        fillOpacity: 0.08
+      }
+    ).addTo(driverLocationMap);
+
+  /*
+   * Manual dragging disables automatic map following.
+   * The Re-center button restores following.
+   */
+  driverLocationMap.on(
+    "dragstart",
+    function () {
+      driverMapFollow = false;
+    }
+  );
 
   L.control.layers(
     {
@@ -1600,16 +1666,108 @@ function showDriverLocationMap(
     }
   ).addTo(driverLocationMap);
 
+  L.control.scale(
+    {
+      imperial: false,
+      position: "bottomleft"
+    }
+  ).addTo(driverLocationMap);
+
   setTimeout(function () {
     driverLocationMap.invalidateSize();
   }, 150);
 }
+
+function recenterDriverMap() {
+  const gpsStatus =
+    document.getElementById(
+      "driver-gps-status"
+    );
+
+  /*
+   * If Online and the watcher previously stopped
+   * because of a GPS error, safely retry it.
+   */
+  if (
+    isOnline &&
+    driverLocationWatchId === null
+  ) {
+    startDriverLiveLocation();
+  }
+
+  const storedLocation =
+    driverLastKnownLocation ||
+    readStoredObject(
+      DRIVER_LOCATION_KEY,
+      null
+    );
+
+  if (
+    !storedLocation ||
+    !Number.isFinite(
+      Number(storedLocation.latitude)
+    ) ||
+    !Number.isFinite(
+      Number(storedLocation.longitude)
+    )
+  ) {
+    /*
+     * Do not manually start GPS while Offline.
+     */
+    if (
+      gpsStatus &&
+      !isOnline
+    ) {
+      gpsStatus.textContent =
+        "GPS paused while driver is offline.";
+    }
+
+    return;
+  }
+
+  driverMapFollow = true;
+
+  showDriverLocationMap(
+    Number(storedLocation.latitude),
+    Number(storedLocation.longitude),
+    Number(
+      storedLocation.accuracy || 0
+    )
+  );
+
+  if (driverLocationMap) {
+    driverLocationMap.setView(
+      [
+        Number(storedLocation.latitude),
+        Number(storedLocation.longitude)
+      ],
+      17,
+      {
+        animate: true
+      }
+    );
+  }
+}
+
 
 function startDriverLiveLocation() {
   const gpsStatus =
     document.getElementById(
       "driver-gps-status"
     );
+
+  /*
+   * Absolute 3R rule:
+   * Offline means GPS stays paused.
+   */
+  if (!isOnline) {
+    if (gpsStatus) {
+      gpsStatus.textContent =
+        "GPS paused while driver is offline.";
+    }
+
+    return;
+  }
 
   if (!navigator.geolocation) {
     if (gpsStatus) {
@@ -1624,12 +1782,17 @@ function startDriverLiveLocation() {
     return;
   }
 
+  /*
+   * Protected single-watcher rule.
+   * If tracking already exists, reuse it.
+   */
   if (driverLocationWatchId !== null) {
-    navigator.geolocation.clearWatch(
-      driverLocationWatchId
-    );
+    if (gpsStatus) {
+      gpsStatus.textContent =
+        "GPS active • Live tracking running";
+    }
 
-    driverLocationWatchId = null;
+    return;
   }
 
   if (gpsStatus) {
@@ -1646,13 +1809,38 @@ function startDriverLiveLocation() {
         const longitude =
           position.coords.longitude;
 
+        const accuracy =
+          Number(
+            position.coords.accuracy ||
+            0
+          );
+
+        const heading =
+          Number.isFinite(
+            position.coords.heading
+          )
+            ? position.coords.heading
+            : null;
+
+        const speed =
+          Number.isFinite(
+            position.coords.speed
+          ) &&
+          position.coords.speed >= 0
+            ? position.coords.speed
+            : null;
+
         const driverLocation = {
           latitude: latitude,
           longitude: longitude,
-          accuracy:
-            position.coords.accuracy,
+          accuracy: accuracy,
+          heading: heading,
+          speed: speed,
           updatedAt: Date.now()
         };
+
+        driverLastKnownLocation =
+          driverLocation;
 
         saveStoredObject(
           DRIVER_LOCATION_KEY,
@@ -1674,22 +1862,62 @@ function startDriverLiveLocation() {
         }
 
         if (gpsStatus) {
+          const gpsParts = [
+            "GPS active"
+          ];
+
+          if (accuracy > 0) {
+            gpsParts.push(
+              "±" +
+              Math.round(accuracy) +
+              " m"
+            );
+          }
+
+          if (speed !== null) {
+            gpsParts.push(
+              Math.round(
+                speed * 3.6
+              ) +
+              " km/h"
+            );
+          }
+
+          if (heading !== null) {
+            gpsParts.push(
+              Math.round(heading) +
+              "° heading"
+            );
+          }
+
           gpsStatus.textContent =
-            "GPS active • Accuracy " +
-            Math.round(
-              position.coords.accuracy
-            ) +
-            " metres";
+            gpsParts.join(" • ");
         }
 
         showDriverLocationMap(
           latitude,
-          longitude
+          longitude,
+          accuracy
         );
       },
 
       function (error) {
-        driverLocationWatchId = null;
+        /*
+         * Permission denial is fatal.
+         * Temporary timeout/unavailable errors keep
+         * the same watcher so Android can recover.
+         */
+        if (
+          error.code === 1 &&
+          driverLocationWatchId !== null &&
+          navigator.geolocation
+        ) {
+          navigator.geolocation.clearWatch(
+            driverLocationWatchId
+          );
+
+          driverLocationWatchId = null;
+        }
 
         if (gpsStatus) {
           gpsStatus.textContent =
@@ -1697,13 +1925,16 @@ function startDriverLiveLocation() {
             error.message;
         }
 
-        alert(
-          "Driver GPS error: " +
-          error.message +
-          " (Code " +
-          error.code +
-          ")"
-        );
+        /*
+         * Avoid repeated alert storms for temporary
+         * GPS timeout/unavailable events.
+         */
+        if (error.code === 1) {
+          alert(
+            "Driver GPS permission is required " +
+            "while the driver is Online."
+          );
+        }
       },
 
       {
@@ -2054,8 +2285,16 @@ function initializeDriverApp() {
   loadTodayActivity();
   loadCurrentRide();
 
-  // RUDOLF AUTO GPS START
-  startDriverLiveLocation();
+  /*
+   * 3R DRS-D AUTO GPS:
+   * Online  -> tracking active
+   * Offline -> tracking paused
+   */
+  if (isOnline) {
+    startDriverLiveLocation();
+  } else {
+    stopDriverLiveLocation();
+  }
 
   setInterval(
     loadCurrentRide,
@@ -2072,6 +2311,9 @@ function initializeDriverApp() {
 // HTML BUTTON CONNECTIONS
 window.startDriverLiveLocation =
   startDriverLiveLocation;
+
+window.recenterDriverMap =
+  recenterDriverMap;
 
 window.toggleDriverAvailability =
   toggleDriverAvailability;
