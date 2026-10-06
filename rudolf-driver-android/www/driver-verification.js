@@ -368,6 +368,19 @@
     const contentType =
       verificationContentType(file);
 
+
+    // 3R DRS-D — Driver verification selfie must be an image.
+    // Other verification documents keep their existing image/PDF support.
+    if (
+      path.includes("/driver-photo/") &&
+      !contentType.startsWith("image/")
+    ) {
+      throw new Error(
+        "Driver Photo / Selfie must be an image."
+      );
+    }
+
+
     const permissionResponse =
       await fetch(
         DRIVER_VERIFICATION_UPLOAD_URL,
