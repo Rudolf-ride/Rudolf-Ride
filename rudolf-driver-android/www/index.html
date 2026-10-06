@@ -256,6 +256,39 @@
 
 </section>
 
+
+<!-- 3R DRS-D — ISOLATED LIVE SECURITY SELFIE -->
+<section
+  id="driver-security-card"
+  class="availability-card"
+  style="display:none;border:2px solid #dc2626;"
+>
+  <div>
+    <strong>
+      🛡️ Security Selfie Required
+    </strong>
+
+    <p id="driver-security-message">
+      Admin has requested a fresh live security selfie.
+    </p>
+  </div>
+
+  <button
+    id="driver-security-selfie-btn"
+    type="button"
+  >
+    📸 Take Security Selfie
+  </button>
+
+  <input
+    id="driver-security-selfie-input"
+    type="file"
+    accept="image/*"
+    capture="user"
+    style="display:none;"
+  >
+</section>
+
 <section class="availability-card">
       <div>
         <strong id="driver-status">You're Offline</strong>
@@ -1178,6 +1211,7 @@
   <!-- 3R: old in-app ride popup disabled; native popup is active -->
 
 <script src="driver-verification.js"></script>
+<script src="driver-security.js?v=1"></script>
 <script src="driver-messages.js"></script>
 <script type="module" src="admin-messages.js"></script>
 <script src="mobile-push.js" defer></script>
