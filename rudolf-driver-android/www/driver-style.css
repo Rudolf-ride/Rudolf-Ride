@@ -3962,3 +3962,19 @@ body {
   font-weight: 700 !important;
   line-height: 13px !important;
 }
+
+/* =====================================================
+   3R DRS-D — MAP CONTROL COLLISION REPAIR
+   CSS ONLY.
+   Keep GPS status + Re-center in their existing position.
+   Move ONLY Leaflet Zoom and Layers controls downward.
+===================================================== */
+
+#driver-home-section #driver-location-map .leaflet-control-zoom {
+  margin-top: 68px !important;
+}
+
+#driver-home-section #driver-location-map .leaflet-control-layers {
+  margin-top: 68px !important;
+}
+
