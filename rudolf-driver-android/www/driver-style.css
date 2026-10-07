@@ -3896,3 +3896,69 @@ body {
 .activity-stats span {
   font-size: 12px !important;
 }
+
+
+/* ==================================================
+   3R DRS-D — DASHBOARD TEXT SPECIFICITY REPAIR
+   TEXT PROPERTIES ONLY
+   CARD / MAP / GPS / MARKER / SECURITY PROTECTED
+   ================================================== */
+
+/* You're Online */
+#driver-home-section #driver-status {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+
+/* Go Online / Go Offline */
+#driver-home-section #availability-btn {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+
+/* Payment label */
+#driver-home-section #rr-payment-menu > summary::after {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+
+/* Activity button */
+#driver-home-section #rr-activity-btn {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+
+/* Phone + Messages */
+#driver-home-section .driver-profile-card .vehicle-info > div > strong {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  line-height: 15px !important;
+}
+
+/* Call passenger + Open chat */
+#driver-home-section .driver-profile-card .vehicle-info > div > p {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 12px !important;
+}
+
+/* Acceptance rate — intentionally largest dashboard text */
+#driver-home-section #driver-acceptance-rate {
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  line-height: 24px !important;
+}
+
+/* Rides / Completed / Earnings values */
+#driver-home-section .activity-card .activity-stats strong {
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  line-height: 20px !important;
+}
+
+/* Rides / Completed / Earnings labels */
+#driver-home-section .activity-card .activity-stats span {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 13px !important;
+}
