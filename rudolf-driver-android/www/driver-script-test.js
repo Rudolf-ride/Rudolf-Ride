@@ -567,6 +567,7 @@ let driverLastKnownLocation = null;
 let driverMapFollow = true;
 let driverLocationMap = null;
 let driverLocationMarker = null;
+let passengerPickupMarker = null;
 let lastRideSignature = "";
 
 
@@ -2348,6 +2349,177 @@ function recenterDriverMap() {
 }
 
 
+
+/* =========================================
+   3R DRS-D-CDA — PASSENGER PICKUP MARKER
+
+   READ ONLY:
+   pickupLatitude
+   pickupLongitude
+
+   DOES NOT MODIFY:
+   Driver GPS
+   Driver map follow
+   Driver availability
+   Verification
+   Live Security
+   Popup / ringtone
+   Messaging
+   ========================================= */
+
+function clearPassengerPickupMarker() {
+
+  if (
+    passengerPickupMarker &&
+    driverLocationMap
+  ) {
+
+    try {
+
+      driverLocationMap.removeLayer(
+        passengerPickupMarker
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Passenger pickup marker clear:",
+        error
+      );
+    }
+  }
+
+  passengerPickupMarker = null;
+}
+
+
+function syncPassengerPickupMarker(ride) {
+
+  const status =
+    String(
+      ride && ride.status
+        ? ride.status
+        : ""
+    ).trim();
+
+
+  const markerStatuses =
+    new Set([
+      "Ride accepted",
+      "Driver accepted your ride",
+      "Driver is on the way",
+      "Driver has arrived at pickup"
+    ]);
+
+
+  if (
+    !ride ||
+    !markerStatuses.has(status)
+  ) {
+
+    clearPassengerPickupMarker();
+
+    return;
+  }
+
+
+  const latitude =
+    Number(
+      ride.pickupLatitude
+    );
+
+  const longitude =
+    Number(
+      ride.pickupLongitude
+    );
+
+
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude)
+  ) {
+
+    clearPassengerPickupMarker();
+
+    return;
+  }
+
+
+  if (
+    !driverLocationMap ||
+    typeof L === "undefined"
+  ) {
+
+    return;
+  }
+
+
+  const pickupLocation = [
+    latitude,
+    longitude
+  ];
+
+
+  if (passengerPickupMarker) {
+
+    passengerPickupMarker.setLatLng(
+      pickupLocation
+    );
+
+    return;
+  }
+
+
+  const passengerPickupIcon =
+    L.divIcon({
+
+      className:
+        "rudolf-passenger-pickup-icon",
+
+      html:
+        '<div class="rudolf-passenger-pickup-pin">' +
+          '<div class="rudolf-passenger-pickup-dot">' +
+            '👤' +
+          '</div>' +
+        '</div>',
+
+      iconSize: [
+        48,
+        56
+      ],
+
+      iconAnchor: [
+        24,
+        54
+      ],
+
+      popupAnchor: [
+        0,
+        -50
+      ]
+    });
+
+
+  passengerPickupMarker =
+    L.marker(
+      pickupLocation,
+      {
+        icon:
+          passengerPickupIcon,
+
+        title:
+          "Passenger pickup"
+      }
+    )
+      .addTo(
+        driverLocationMap
+      )
+      .bindPopup(
+        "<strong>📍 Passenger Pickup</strong>"
+      );
+}
+
+
 function startDriverLiveLocation() {
   const gpsStatus =
     document.getElementById(
@@ -2496,6 +2668,10 @@ function startDriverLiveLocation() {
           latitude,
           longitude,
           accuracy
+        );
+
+        syncPassengerPickupMarker(
+          getCurrentRide()
         );
       },
 
