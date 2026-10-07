@@ -28,6 +28,17 @@
 }
 </style>
 
+
+<style id="rr-phone-message-unclip">
+/* 3R DRS-D — ONLY Phone + Messages small subtitles.
+   Relative positioning does NOT resize the card. */
+#passenger-call-label,
+#driver-open-chat-label {
+  position: relative !important;
+  top: -4px !important;
+}
+</style>
+
 </head>
 
 <body>
@@ -241,7 +252,7 @@
     >
       💬
       <strong>Messages</strong>
-      <p style="font-size:12px;">
+      <p id="driver-open-chat-label" style="font-size:12px;">
         Open chat
       </p>
     </div>
