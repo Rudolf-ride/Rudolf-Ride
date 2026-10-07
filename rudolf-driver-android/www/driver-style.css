@@ -3865,3 +3865,34 @@ body {
   transform:
     rotate(45deg);
 }
+
+
+/* ==========================================
+   3R DRS-D — DASHBOARD TEXT SIZE ONLY
+   CARD DIMENSIONS / SPACING PROTECTED
+   ========================================== */
+
+/* Phone + Messages main labels */
+.vehicle-info > div > strong {
+  font-size: 15px !important;
+}
+
+/* Phone + Messages secondary labels */
+.vehicle-info > div > p {
+  font-size: 12px !important;
+}
+
+/* Acceptance rate */
+#driver-acceptance-rate {
+  font-size: 20px !important;
+}
+
+/* Rides / Completed / Earnings values */
+.activity-stats strong {
+  font-size: 18px !important;
+}
+
+/* Rides / Completed / Earnings labels */
+.activity-stats span {
+  font-size: 12px !important;
+}
